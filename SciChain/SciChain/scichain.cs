@@ -15,7 +15,7 @@ using System.Linq;
 
 
     Lista de dados:
-    0: status = { Rejeição, Confirmação, envio do artigo, aprovação, revisão, publicação } = new byte[] { 0, 0, 0, 0, 0, 0 }
+    0: status = { Rejeição, Confirmação, envio do artigo, aprovação, publicação } = new byte[] { 0, 0, 0, 0, 0 }
     1: Endereço do escritor
     2: Endereço do editor
     3: Endereço dos revisores
@@ -34,6 +34,7 @@ namespace SciChain
 {
     public class SciChain : SmartContract
     {
+        enum Process_Status { Not_Found, Process_Rejected, Waiting_Editor_Acceptance, Waiting_article, Waiting_approval, Waiting_for_publication, Published };
         static byte[] editorPrefix = { 0, 0, 0 };
         static byte[] editorProcessPrefix = { 0, 0, 1 };
         static byte[] reviewersPrefix = { 0, 1, 1 };
@@ -46,57 +47,15 @@ namespace SciChain
 
         public int GetProcessStatus( byte[] processId )
         {
-            // status = { Rejeição, Confirmação, envio do artigo, aprovação, revisão, publicação } = new byte[] { 0, 0, 0, 0, 0, 0 }
-            // resto dos bytes do processo são dados enviados.
-            byte[] data = Storage.Get( Storage.CurrentContext, processId );
+            List<String> process = Storage.Get( Storage.CurrentContext, processId ).ToString().Split( ';' ).OfType<String>().ToList();
 
-            if( data.Length == 0 )
+            if( process.Count == 0 )
             {
                 Runtime.Notify( "Process not found" );
-                return -1;
+                return (int)Process_Status.Not_Found;
             }
 
-            if ( data[0] == 1 )
-            {
-                Runtime.Notify( "Process Rejected" );
-                return 1;
-            }
-
-            if (data[5] == 1)
-            {
-                Runtime.Notify( "Published" );
-                return data.Length - 1;
-            }
-
-            for ( int i = 1; i < 6; ++i  )
-            {
-                if( data[i] == 0 )
-                {
-                    if( i == 1 )// Confirmação
-                    {
-                        Runtime.Notify( "Waiting Editor Acceptance" );
-                    }
-                    else if( i == 2 )// Envio do artigo e da pk do escritor
-                    {
-                        Runtime.Notify( "Waiting article" );
-                    }
-                    else if( i == 3 ) // Aprovação
-                    {
-                        Runtime.Notify( "Waiting aprroval" );
-                    }
-                    else if( i == 4 ) // Publicado
-                    {
-                        Runtime.Notify( "Waiting for publication" );
-                    }
-                    else // revisão
-                    {
-                        Runtime.Notify( "Waiting revision" );
-                    }
-                    return i;
-                }
-            }
-
-            return -1;
+            return Convert.ToInt32( process[0] );
         }
 
         public byte[] RequestArticle( byte[] data, byte[] editorAdress )
@@ -156,9 +115,15 @@ namespace SciChain
 
         public bool Publish( byte[] data, byte[] processId )
         {
-            if (data.Length <= 0)
+            if( data.Length <= 0 )
             {
                 Runtime.Notify( "No data found" );
+                return false;
+            }
+
+            if( GetProcessStatus( processId ) != (int)Process_Status.Waiting_for_publication )
+            {
+                Runtime.Notify( "Can't publish" );
                 return false;
             }
 
