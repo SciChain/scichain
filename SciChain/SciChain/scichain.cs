@@ -13,10 +13,14 @@ using System;
 
     Formato dos dados do processo
     bytes 0-5: status = { Rejeição, Confirmação, envio do artigo, aprovação, revisão, publicação } = new byte[] { 0, 0, 0, 0, 0, 0 }
-    byte 6: bytes por revisor( x )
-    byte 7: número de revisores( y )
-    byte 8-8+(x*y): endereço dos revisores
-    byte 8+(x*y) + 1 até final: dado corrente
+    byte 6-fim: dado
+
+    sempre o dado corrente. Segundo o status:
+    Confirmação : no dado estará o abstract
+    envio do artigo: no dado estará o artigo
+    aprovação: no dado estará os comentários de cada revisor
+    revisão: estará o artigo revisado
+    publicação: estará vazio
     */
 
 namespace SciChain
@@ -28,8 +32,9 @@ namespace SciChain
         static byte[] reviwersPrefix = { 0, 1, 1 };
         static byte[] processPrefix = { 1, 1, 0 };
         static byte[] publishPrefix = { 1, 1, 1 };
+        static byte[] nonceProcessesPrefix = { 1, 0, 1 };
 
-        public static Object Main(string operation, params object[] args)
+        public static Object Main( string operation, params object[] args )
         {
             switch ( operation )
             {
@@ -133,18 +138,25 @@ namespace SciChain
                 return null;
             }
 
+            byte[] nonceProcessesKey = nonceProcessesPrefix;
+            nonceProcessesKey.Concat( editorKey );
+            byte[] nonce = Storage.Get( Storage.CurrentContext, nonceProcessesKey );
+            nonce.Concat( new byte[] { 1 } );
+            Storage.Put( Storage.CurrentContext, nonceProcessesKey, nonce );
+
             byte[] processKey = processPrefix;
+            processKey.Concat( nonce ); // unicidade do processo
             processKey.Concat( editorAdress );
             processKey.Concat( publisherAdress );
 
-            Storage.Put(Storage.CurrentContext, processKey, new byte[] { 0, 0, 0, 0, 0, 0 } ); // criado apenas os status
+            Storage.Put( Storage.CurrentContext, processKey, new byte[] { 0, 0, 0, 0, 0, 0 } ); // criado apenas os status
 
             byte[] epKey = editorProcessPrefix;
-            epKey.Concat(editorAdress);
+            epKey.Concat( editorAdress );
 
-            byte[] process = Storage.Get( Storage.CurrentContext, epKey );
-            process.Concat( processKey );
-            Storage.Put( Storage.CurrentContext, epKey, process );
+            byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
+            processes.Concat( processKey );
+            Storage.Put( Storage.CurrentContext, epKey, processes );
 
             return processKey;
         }
@@ -193,13 +205,13 @@ namespace SciChain
             byte[] editorKey = editorPrefix;
             editorKey.Concat(editorAdress);
 
-            if ( Storage.Get(Storage.CurrentContext, editorKey) == editorAdress )
+            if ( Storage.Get( Storage.CurrentContext, editorKey) == editorAdress )
             {
                 Runtime.Notify( "Editor is already registered" );
                 return false;
             }
 
-            Storage.Put(Storage.CurrentContext, editorKey, editorAdress);
+            Storage.Put( Storage.CurrentContext, editorKey, editorAdress );
             Runtime.Notify( "Editor registered" );
             return true;
         }
@@ -207,9 +219,9 @@ namespace SciChain
         public static bool RegisterReviewer( byte[] editorAdress, byte[] ReviewerAdress )
         {
             byte[] editorKey = editorPrefix;
-            editorKey.Concat(editorAdress);
+            editorKey.Concat( editorAdress );
 
-            if (Storage.Get(Storage.CurrentContext, editorKey) != editorAdress)
+            if (Storage.Get( Storage.CurrentContext, editorKey ) != editorAdress)
             {
                 Runtime.Notify( "Editor not found" );
                 return false;
