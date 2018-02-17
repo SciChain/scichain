@@ -20,7 +20,7 @@ using System;
     envio do artigo: no dado estará o artigo
     aprovação: no dado estará os comentários de cada revisor
     revisão: estará o artigo revisado
-    publicação: estará vazio
+    publicação: estará o adress do escritor, do editor e dos revisores
     */
 
 namespace SciChain
@@ -34,7 +34,7 @@ namespace SciChain
         static byte[] publishPrefix = { 1, 1, 1 };
         static byte[] nonceProcessesPrefix = { 1, 0, 1 };
 
-        public static Object Main( string operation, params object[] args )
+        public static object Main( string operation, params object[] args )
         {
             switch ( operation )
             {
@@ -161,7 +161,7 @@ namespace SciChain
             return processKey;
         }
 
-        public static bool SendDataToProcess( byte[] ownAdress, byte[] data, byte[] process )
+        public static bool SendDataToProcess( byte[] ownAdress, byte[] process, byte[] data = null )
         {
             // dependendo da parte do processo, essa função vai interpretar de uma forma
             // Os revisores e o escritor podem enviar dados pra o editor
@@ -195,6 +195,8 @@ namespace SciChain
                 Runtime.Notify("It was already published");
                 return false;
             }
+
+            data.Concat( processId );
 
             Storage.Put( Storage.CurrentContext, publishKey, data );
             return true;
