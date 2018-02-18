@@ -13,10 +13,11 @@ using System.Linq;
 
 
     Lista de dados:
-    0: status = { não existe, Rejeição, Confirmação, envio do artigo, aprovação, publicação }
-    1: Endereço do escritor
-    2: Endereço do editor
-    3: Endereço dos revisores
+    0: status = { não existe, Rejeição, Confirmação, envio do artigo, aprovação, publicação } ( 1 byte )
+    1: Endereço do escritor ( 32 bytes )
+    2: Endereço do editor ( 32 bytes )
+    3: número de revisores ( 1 byte )
+    3: Endereço dos revisores ( 32 bytes por revisor )
     4-n: dados
 
     sempre o dado corrente. Segundo o status:
@@ -42,13 +43,12 @@ namespace SciChain
          * Published 6 };
          */
 
-        static byte[] sep = { 59, 0, 0, 59 };
-
         static byte[] editorPrefix = { 0 };
         static byte[] editorProcessPrefix = { 1 };
-        static byte[] reviewersPrefix = { 2 };
-        static byte[] processPrefix = { 3 };
-        static byte[] publishPrefix = { 4 };
+        static byte[] reviewerPrefix = { 2 };
+        static byte[] reviewersPrefix = { 3 };
+        static byte[] processPrefix = { 4 };
+        static byte[] publishPrefix = { 5 };
 
         public static object Main( string operation, params object[] args )
         {
@@ -93,6 +93,7 @@ namespace SciChain
 
             byte[] editorKey = editorPrefix;
             editorKey.Concat( editorAdress );
+            editorKey = Hash256( editorKey );
 
             if( Storage.Get( Storage.CurrentContext, editorKey ) != editorAdress )
             {
@@ -102,17 +103,18 @@ namespace SciChain
 
             byte[] epKey = editorProcessPrefix;
             epKey.Concat( editorAdress );
+            epKey = Hash256( epKey );
 
             byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
 
             byte[] processKey = processPrefix;
-            processKey.Concat( new byte[] { (byte)processKey.Length } ); // unicidade do processo
+            processKey.Concat(Hash256( processes ) ); // unicidade do processo
             processKey.Concat( editorAdress );
             processKey.Concat( publisherAdress );
+            processKey = Hash256( processKey );
 
             Storage.Put( Storage.CurrentContext, processKey, new byte[] { 2 } ); // criado apenas os status
 
-            processes.Concat( sep );
             processes.Concat( processKey );
             Storage.Put( Storage.CurrentContext, epKey, processes );
 
@@ -157,6 +159,7 @@ namespace SciChain
 
             byte[] editorKey = editorPrefix;
             editorKey.Concat( editorAdress );
+            editorKey = Hash256( editorKey );
 
             if( Storage.Get( Storage.CurrentContext, editorKey ) != editorAdress )
             {
@@ -166,32 +169,28 @@ namespace SciChain
 
             byte[] epKey = editorProcessPrefix;
             epKey.Concat( editorAdress );
+            epKey = Hash256( epKey );
 
             byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
 
-            int lastSep = -1;
-            for( int i = 0; i < processes.Length; ++i )
+            for( int i = 0; i < processes.Length; i += 256 )
             {
-                if( processes.Range( i, sep.Length ) == sep )
+                if( processes.Range( i, 256 ) == processId)
                 {
-                    byte[] process = processes.Range( lastSep + 1, i - lastSep + 1 );
-                    if( process == processId )
+                    byte[] publishKey = publishPrefix;
+                    publishKey.Concat( processId );
+                    publishKey = Hash256( publishKey );
+
+                    if( Storage.Get( Storage.CurrentContext, publishKey ).Length >= 0 )
                     {
-                        byte[] publishKey = publishPrefix;
-                        publishKey.Concat(processId);
-
-                        if( Storage.Get(Storage.CurrentContext, publishKey ).Length >= 0)
-                        {
-                            Runtime.Notify( "It was already published" );
-                            return false;
-                        }
-
-                        data.Concat( processId );
-
-                        Storage.Put( Storage.CurrentContext, publishKey, data );
-                        return true;
+                        Runtime.Notify( "It was already published" );
+                        return false;
                     }
-                    lastSep = i + sep.Length;
+
+                    data.Concat( processId );
+
+                    Storage.Put( Storage.CurrentContext, publishKey, data );
+                    return true;
                 }
             }
 
@@ -205,6 +204,7 @@ namespace SciChain
 
             byte[] editorKey = editorPrefix;
             editorKey.Concat( editorAdress );
+            editorKey = Hash256( editorKey );
 
             if ( Storage.Get( Storage.CurrentContext, editorKey ) == editorAdress )
             {
@@ -214,7 +214,8 @@ namespace SciChain
 
             Storage.Put( Storage.CurrentContext, editorKey, editorAdress );
             Runtime.Notify( "Editor registered" );
-            return editorAdress;
+
+            return editorKey;
         }
 
         public static bool RegisterReviewer( byte[] ReviewerAdress )
@@ -223,34 +224,29 @@ namespace SciChain
 
             byte[] editorKey = editorPrefix;
             editorKey.Concat( editorAdress );
+            editorKey = Hash256( editorKey );
 
-            if( Storage.Get( Storage.CurrentContext, editorKey ) != editorAdress )
+            if ( Storage.Get( Storage.CurrentContext, editorKey ) != editorAdress )
             {
                 Runtime.Notify( "Not an Editor" );
                 return false;
             }
 
             byte[] reviewersKey = reviewersPrefix;
-            editorKey.Concat( editorKey );
+            reviewersKey.Concat( editorKey );
+            reviewersKey = Hash256( reviewersKey );
 
-            byte[] reviewers = Storage.Get( Storage.CurrentContext, reviewersKey);
+            byte[] reviewers = Storage.Get( Storage.CurrentContext, reviewersKey );
 
-            int lastSep = -1;
-            for( int i = 0; i < reviewers.Length; ++i )
+            for( int i = 0; i < reviewers.Length; i += 256 )
             {
-                if( reviewers.Range( i, sep.Length ) == sep )
+                if( reviewers.Range( i, 256 ) == ReviewerAdress )
                 {
-                    byte[] reviewer = reviewers.Range( lastSep + 1, i - lastSep + 1 );
-                    if( reviewer == ReviewerAdress )
-                    {
-                        Runtime.Notify( "Reviwer already registered" );
-                        return false;
-                    }
-                    lastSep = i + sep.Length;
+                    Runtime.Notify( "Reviwer already registered" );
+                    return false;
                 }  
             }
 
-            reviewers.Concat( sep );
             reviewers.Concat( ReviewerAdress );
 
             Storage.Put( Storage.CurrentContext, reviewersKey, reviewers );
