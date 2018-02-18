@@ -15,7 +15,7 @@ using System.Linq;
 
 
     Lista de dados:
-    0: status = { Rejeição, Confirmação, envio do artigo, aprovação, publicação } = new byte[] { 0, 0, 0, 0, 0 }
+    0: status = { não existe, Rejeição, Confirmação, envio do artigo, aprovação, publicação }
     1: Endereço do escritor
     2: Endereço do editor
     3: Endereço dos revisores
@@ -34,31 +34,61 @@ namespace SciChain
 {
     public class SciChain : SmartContract
     {
-        enum Process_Status { Not_Found, Process_Rejected, Waiting_Editor_Acceptance, Waiting_article, Waiting_approval, Waiting_for_publication, Published };
-        static byte[] editorPrefix = { 0, 0, 0 };
-        static byte[] editorProcessPrefix = { 0, 0, 1 };
-        static byte[] reviewersPrefix = { 0, 1, 1 };
-        static byte[] processPrefix = { 1, 1, 0 };
-        static byte[] publishPrefix = { 1, 1, 1 };
+        /* enum Process_Status 
+         * { Not_Found, 0
+         * Process_Rejected,  1
+         * Waiting_Editor_Acceptance,  2
+         * Waiting_article,  3
+         * Waiting_approval,  4
+         * Waiting_for_publication,  5
+         * Published 6 };
+         */
 
-        public static void Main()
+
+        static byte sep = 59;
+
+        static byte[] editorPrefix = { 0 };
+        static byte[] editorProcessPrefix = { 1 };
+        static byte[] reviewersPrefix = { 2 };
+        static byte[] processPrefix = { 3 };
+        static byte[] publishPrefix = { 4 };
+
+        public static object Main( string operation, params object[] args )
         {
-        }
-
-        public int GetProcessStatus( byte[] processId )
-        {
-            List<String> process = Storage.Get( Storage.CurrentContext, processId ).ToString().Split( ';' ).OfType<String>().ToList();
-
-            if( process.Count == 0 )
+            switch (operation)
             {
-                Runtime.Notify( "Process not found" );
-                return (int)Process_Status.Not_Found;
+                case "GetProcessStatus":
+                    if( args.Length != 1 ) return false;
+                    return GetProcessStatus( (byte[])args[0] );
+                case "RequestArticle":
+                    if( args.Length != 2 ) return false;
+                    return RequestArticle( (byte[])args[0], (byte[])args[1] );
+                case "SendDataToProcess":
+                    if( args.Length != 2 ) return false;
+                    return SendDataToProcess( (byte[])args[0], (byte[])args[1] );
+                case "ReceiveFromProcess":
+                    if( args.Length != 1 ) return false;
+                    return ReceiveFromProcess( (byte[])args[0] );
+                case "Publish":
+                    if( args.Length != 2 ) return false;
+                    return Publish( (byte[])args[0], (byte[])args[1] );
+                case "RegisterEditor":
+                    if( args.Length != 0 ) return false;
+                    return RegisterEditor();
+                case "RegisterReviewer":
+                    if( args.Length != 1 ) return false;
+                    return RegisterReviewer( (byte[])args[0] );
+                default:
+                    return false;
             }
-
-            return Convert.ToInt32( process[0] );
         }
 
-        public byte[] RequestArticle( byte[] data, byte[] editorAdress )
+        public static byte GetProcessStatus( byte[] processId )
+        {
+            return Storage.Get( Storage.CurrentContext, processId )[0];
+        }
+
+        public static byte[] RequestArticle( byte[] data, byte[] editorAdress )
         {
             // Iniciando pedido de publicação
 
@@ -73,27 +103,26 @@ namespace SciChain
                 return null;
             }
 
-            // verificando número de processos do editor
             byte[] epKey = editorProcessPrefix;
             epKey.Concat( editorAdress );
 
-            List<String> processes = Storage.Get( Storage.CurrentContext, epKey ).ToString().Split(';').OfType<String>().ToList();
+            byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
 
             byte[] processKey = processPrefix;
-            processKey.Concat( processKey.Length.ToString().AsByteArray() ); // unicidade do processo
+            processKey.Concat( new byte[] { (byte)processKey.Length } ); // unicidade do processo
             processKey.Concat( editorAdress );
             processKey.Concat( publisherAdress );
 
-            List<String> currProcess = new List<String> () { new byte[] { 0, 0, 0, 0, 0, 0 }.ToString() };
-            Storage.Put( Storage.CurrentContext, processKey, String.Join( ";", currProcess ).AsByteArray() ); // criado apenas os status
+            Storage.Put( Storage.CurrentContext, processKey, new byte[] { 2 } ); // criado apenas os status
 
-            processes.Add( processKey.ToString() );
-            Storage.Put( Storage.CurrentContext, epKey, String.Join( ";", processes ).AsByteArray() );
+            processes.Concat( new byte[] { sep } );
+            processes.Concat( processKey );
+            Storage.Put( Storage.CurrentContext, epKey, processes );
 
             return processKey;
         }
 
-        public bool SendDataToProcess( byte[] process, byte[] data )
+        public static bool SendDataToProcess( byte[] process, byte[] data )
         {
             byte[] ownAdress = ExecutionEngine.CallingScriptHash;
             // dependendo da parte do processo, essa função vai interpretar de uma forma
@@ -103,7 +132,7 @@ namespace SciChain
             return true;
         }
 
-        public byte[] ReceiveFromProcess( byte[] process )
+        public static byte[] ReceiveFromProcess( byte[] process )
         {
             byte[] ownAdress = ExecutionEngine.CallingScriptHash;
             // dependendo da parte do processo, essa função vai interpretar de uma forma
@@ -113,7 +142,7 @@ namespace SciChain
             return null;
         }
 
-        public bool Publish( byte[] data, byte[] processId )
+        public static bool Publish( byte[] data, byte[] processId )
         {
             if( data.Length <= 0 )
             {
@@ -121,7 +150,7 @@ namespace SciChain
                 return false;
             }
 
-            if( GetProcessStatus( processId ) != (int)Process_Status.Waiting_for_publication )
+            if( GetProcessStatus( processId ) != 5 )
             {
                 Runtime.Notify( "Can't publish" );
                 return false;
@@ -141,30 +170,39 @@ namespace SciChain
             byte[] epKey = editorProcessPrefix;
             epKey.Concat( editorAdress );
 
-            List<String> processes = Storage.Get( Storage.CurrentContext, epKey ).ToString().Split(';').OfType<String>().ToList();
+            byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
 
-            if( !processes.Contains( processId.ToString() ) )
+            int lastSep = -1;
+            for( int i = 0; i < processes.Length; ++i )
             {
-                Runtime.Notify( "Not a process of this Editor" );
-                return false;
+                if( processes[i] == sep )
+                {
+                    byte[] process = processes.Range( lastSep + 1, i - lastSep + 1 );
+                    if( process == processId )
+                    {
+                        byte[] publishKey = publishPrefix;
+                        publishKey.Concat(processId);
+
+                        if (Storage.Get(Storage.CurrentContext, publishKey).Length >= 0)
+                        {
+                            Runtime.Notify("It was already published");
+                            return false;
+                        }
+
+                        data.Concat(processId);
+
+                        Storage.Put(Storage.CurrentContext, publishKey, data);
+                        return true;
+                    }
+                    lastSep = i;
+                }
             }
 
-            byte[] publishKey = publishPrefix;
-            publishKey.Concat( processId );
-
-            if ( Storage.Get( Storage.CurrentContext, publishKey ).Length >= 0 )
-            {
-                Runtime.Notify("It was already published");
-                return false;
-            }
-
-            data.Concat( processId );
-
-            Storage.Put( Storage.CurrentContext, publishKey, data );
-            return true;
+            Runtime.Notify("Not a process of this Editor");
+            return false;
         }
 
-        public byte[] RegisterEditor()
+        public static byte[] RegisterEditor()
         {
             byte[] editorAdress = ExecutionEngine.CallingScriptHash;
 
@@ -182,7 +220,7 @@ namespace SciChain
             return editorAdress;
         }
 
-        public bool RegisterReviewer( byte[] ReviewerAdress )
+        public static bool RegisterReviewer( byte[] ReviewerAdress )
         {
             byte[] editorAdress = ExecutionEngine.CallingScriptHash;
 
@@ -198,17 +236,27 @@ namespace SciChain
             byte[] reviewersKey = reviewersPrefix;
             editorKey.Concat( editorKey );
 
-            List<String> reviewers = Storage.Get(Storage.CurrentContext, reviewersKey).ToString().Split(';').OfType<String>().ToList();
+            byte[] reviewers = Storage.Get( Storage.CurrentContext, reviewersKey);
 
-            if( reviewers.Contains( ReviewerAdress.ToString() ) )
+            int lastSep = -1;
+            for( int i = 0; i < reviewers.Length; ++i )
             {
-                Runtime.Notify( "Reviwer already registered" );
-                return false;
+                if( reviewers[i] == sep )
+                {
+                    byte[] reviewer = reviewers.Range( lastSep + 1, i - lastSep + 1 );
+                    if( reviewer == ReviewerAdress )
+                    {
+                        Runtime.Notify("Reviwer already registered");
+                        return false;
+                    }
+                    lastSep = i;
+                }  
             }
 
-            reviewers.Add( ReviewerAdress.ToString() );
+            reviewers.Concat( new byte[] { sep } );
+            reviewers.Concat( ReviewerAdress );
 
-            Storage.Put( Storage.CurrentContext, reviewersKey, String.Join( ";", reviewers ).AsByteArray() );
+            Storage.Put( Storage.CurrentContext, reviewersKey, reviewers );
             Runtime.Notify( "Reviewer registered" );
             return true;
         }
