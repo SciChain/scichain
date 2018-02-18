@@ -1,8 +1,6 @@
 ﻿using Neo.SmartContract.Framework;
 using Neo.SmartContract.Framework.Services.Neo;
 using Neo.SmartContract.Framework.Services.System;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 /* Etapas:
@@ -44,8 +42,7 @@ namespace SciChain
          * Published 6 };
          */
 
-
-        static byte sep = 59;
+        static byte[] sep = { 59, 0, 0, 59 };
 
         static byte[] editorPrefix = { 0 };
         static byte[] editorProcessPrefix = { 1 };
@@ -115,7 +112,7 @@ namespace SciChain
 
             Storage.Put( Storage.CurrentContext, processKey, new byte[] { 2 } ); // criado apenas os status
 
-            processes.Concat( new byte[] { sep } );
+            processes.Concat( sep );
             processes.Concat( processKey );
             Storage.Put( Storage.CurrentContext, epKey, processes );
 
@@ -175,7 +172,7 @@ namespace SciChain
             int lastSep = -1;
             for( int i = 0; i < processes.Length; ++i )
             {
-                if( processes[i] == sep )
+                if( processes.Range( i, sep.Length ) == sep )
                 {
                     byte[] process = processes.Range( lastSep + 1, i - lastSep + 1 );
                     if( process == processId )
@@ -183,22 +180,22 @@ namespace SciChain
                         byte[] publishKey = publishPrefix;
                         publishKey.Concat(processId);
 
-                        if (Storage.Get(Storage.CurrentContext, publishKey).Length >= 0)
+                        if( Storage.Get(Storage.CurrentContext, publishKey ).Length >= 0)
                         {
-                            Runtime.Notify("It was already published");
+                            Runtime.Notify( "It was already published" );
                             return false;
                         }
 
-                        data.Concat(processId);
+                        data.Concat( processId );
 
-                        Storage.Put(Storage.CurrentContext, publishKey, data);
+                        Storage.Put( Storage.CurrentContext, publishKey, data );
                         return true;
                     }
-                    lastSep = i;
+                    lastSep = i + sep.Length;
                 }
             }
 
-            Runtime.Notify("Not a process of this Editor");
+            Runtime.Notify( "Not a process of this Editor" );
             return false;
         }
 
@@ -229,7 +226,7 @@ namespace SciChain
 
             if( Storage.Get( Storage.CurrentContext, editorKey ) != editorAdress )
             {
-                Runtime.Notify("Not an Editor");
+                Runtime.Notify( "Not an Editor" );
                 return false;
             }
 
@@ -241,19 +238,19 @@ namespace SciChain
             int lastSep = -1;
             for( int i = 0; i < reviewers.Length; ++i )
             {
-                if( reviewers[i] == sep )
+                if( reviewers.Range( i, sep.Length ) == sep )
                 {
                     byte[] reviewer = reviewers.Range( lastSep + 1, i - lastSep + 1 );
                     if( reviewer == ReviewerAdress )
                     {
-                        Runtime.Notify("Reviwer already registered");
+                        Runtime.Notify( "Reviwer already registered" );
                         return false;
                     }
-                    lastSep = i;
+                    lastSep = i + sep.Length;
                 }  
             }
 
-            reviewers.Concat( new byte[] { sep } );
+            reviewers.Concat( sep );
             reviewers.Concat( ReviewerAdress );
 
             Storage.Put( Storage.CurrentContext, reviewersKey, reviewers );
