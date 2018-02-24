@@ -111,9 +111,6 @@ namespace Neo.SmartContract
         {
             byte[] autorAdress = ExecutionEngine.CallingScriptHash;
 
-            byte[] autorKey = autorPrefix;
-            autorKey.Concat( editorAdress );
-            autorKey = Hash256( autorKey );
 
             byte[] editorKey = editorPrefix;
             editorKey.Concat( editorAdress );
@@ -139,6 +136,11 @@ namespace Neo.SmartContract
 
             processes.Concat( processKey );
             Storage.Put( Storage.CurrentContext, epKey, processes );
+
+            byte[] autorKey = autorPrefix;
+            autorKey.Concat( processKey );
+            autorKey.Concat( editorAdress );
+            autorKey = Hash256( autorKey );
 
             byte[] processData = new byte[] { 2 }; //status
             processData.Concat( autorKey );
@@ -218,6 +220,7 @@ namespace Neo.SmartContract
             if( status == 3 )
             {
                 byte[] autorKey = autorPrefix;
+                autorKey.Concat( processkey );
                 autorKey.Concat( ownAdress );
                 autorKey = Hash256( autorKey );
 
@@ -237,6 +240,7 @@ namespace Neo.SmartContract
             if( status == 4 )
             {
                 byte[] reviewerKey = reviewerPrefix;
+                reviewerKey.Concat( processkey );
                 reviewerKey.Concat( ownAdress );
                 reviewerKey = Hash256( reviewerKey );
 
@@ -309,6 +313,7 @@ namespace Neo.SmartContract
             if( status == 6 )
             {
                 byte[] autorKey = autorPrefix;
+                autorKey.Concat( processkey );
                 autorKey.Concat( ownAdress );
                 autorKey = Hash256( autorKey );
 
@@ -333,6 +338,7 @@ namespace Neo.SmartContract
                 }
 
                 byte[] reviewerKey = reviewerPrefix;
+                reviewerKey.Concat( processkey );
                 reviewerKey.Concat( ownAdress );
                 reviewerKey = Hash256( reviewerKey );
 
@@ -366,6 +372,7 @@ namespace Neo.SmartContract
             byte[] processData = Storage.Get( Storage.CurrentContext, processkey );
 
             byte[] autorKey = autorPrefix;
+            autorKey.Concat( processkey );
             autorKey.Concat( ownAdress );
             autorKey = Hash256( autorKey );
 
@@ -378,6 +385,7 @@ namespace Neo.SmartContract
                 if( processData.Range( 33, 32 ) != editorKey )
                 {
                     byte[] reviewerKey = reviewerPrefix;
+                    reviewerKey.Concat( processkey );
                     reviewerKey.Concat( ownAdress );
                     reviewerKey = Hash256( reviewerKey );
 
