@@ -54,7 +54,7 @@ namespace Neo.SmartContract
         private static byte[] publishPrefix = { 6 };
         private static byte[] reviewerCommentsPrefix = { 7 };
 
-        /*public static object Main( string operation, params object[] args )
+        public static object Main( string operation, params object[] args )
         {
 
             if( operation == "GetProcessStatus()" )
@@ -100,11 +100,6 @@ namespace Neo.SmartContract
             }
 
             return false;
-        }
-        */
-
-        public static void Main(string operation, params object[] args)
-        {
         }
 
         public static byte GetProcessStatus( byte[] processkey )
