@@ -295,10 +295,10 @@ namespace Neo.SmartContract
                 processData[0] = data[0];
                 processData = processData.Range( 0, ( 66 + 32 * processData[65] ) ); // limpando dados anteriores
 
-                byte[] numApproval = new byte[processData[65]];
-
-                for( int i = 0; i < numApproval.Length; i++ )
-                    numApproval[i] = 0;
+                int len = processData[65];
+                byte[] numApproval = new byte[] { };
+                for( int i = 0; i < len; ++i )
+                    numApproval.Concat( new byte[] { 0 } );
                 
                 processData.Concat( numApproval ); // adicionando campos para os revisores avaliarem se o artigo que o autor colocará sem criptografia foi o mesmo que eles avaliaram.
                                                    // 1 não aprovado e 2 aprovado
