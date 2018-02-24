@@ -260,7 +260,7 @@ namespace Neo.SmartContract
 
                         Storage.Put( Storage.CurrentContext, reviewerCommentsKey, data );
 
-                        processData[idx]++;
+                        processData[idx] = (byte)(processData[idx] + 1);
                         if (processData[idx] == processData[65])
                             processData[0] = 5;
 
