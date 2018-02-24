@@ -1,6 +1,7 @@
 ﻿using Neo.SmartContract.Framework;
 using Neo.SmartContract.Framework.Services.Neo;
 using Neo.SmartContract.Framework.Services.System;
+using System;
 using System.Linq;
 
 /* Etapas:
@@ -13,11 +14,19 @@ using System.Linq;
 
 
     Lista de dados:
-    0: status = { não existe, Rejeição, Confirmação, envio do artigo, aprovação, publicação } ( 1 byte )
-    1: Endereço do escritor ( 32 bytes )
-    2: Endereço do editor ( 32 bytes )
+    0: status ( 1 byte ) :
+         * Not_Found 0
+         * Process_Rejected  1
+         * Waiting_Editor_Acceptance  2
+         * Waiting_article  3
+         * Waiting_approval,  4
+         * Waiting_for_publication  5
+         * Published 6
+      
+    1: key do autor/autores ( 32 bytes )
+    2: key do editor ( 32 bytes )
     3: número de revisores ( 1 byte )
-    3: Endereço dos revisores ( 32 bytes por revisor )
+    3: key dos revisores ( 32 bytes por revisor )
     4-n: dados
 
     sempre o dado corrente. Segundo o status:
@@ -29,67 +38,78 @@ using System.Linq;
 
     */
 
-namespace SciChain
+namespace Neo.SmartContract
 {
-    public class SciChain : SmartContract
+    public class SciChain : Framework.SmartContract
     {
-        /* enum Process_Status 
-         * { Not_Found, 0
-         * Process_Rejected,  1
-         * Waiting_Editor_Acceptance,  2
-         * Waiting_article,  3
-         * Waiting_approval,  4
-         * Waiting_for_publication,  5
-         * Published 6 };
-         */
-
-        static byte[] editorPrefix = { 0 };
-        static byte[] editorProcessPrefix = { 1 };
-        static byte[] reviewerPrefix = { 2 };
-        static byte[] reviewersPrefix = { 3 };
-        static byte[] processPrefix = { 4 };
-        static byte[] publishPrefix = { 5 };
+        private static byte[] autorPrefix = { 0 };
+        private static byte[] editorPrefix = { 1 };
+        private static byte[] editorProcessPrefix = { 2 };
+        private static byte[] reviewerPrefix = { 3 };
+        private static byte[] reviewersPrefix = { 4 };
+        private static byte[] processPrefix = { 5 };
+        private static byte[] publishPrefix = { 6 };
 
         public static object Main( string operation, params object[] args )
         {
-            switch (operation)
+
+            if( operation == "GetProcessStatus()" )
             {
-                case "GetProcessStatus":
-                    if( args.Length != 1 ) return false;
-                    return GetProcessStatus( (byte[])args[0] );
-                case "RequestArticle":
-                    if( args.Length != 2 ) return false;
-                    return RequestArticle( (byte[])args[0], (byte[])args[1] );
-                case "SendDataToProcess":
-                    if( args.Length != 2 ) return false;
-                    return SendDataToProcess( (byte[])args[0], (byte[])args[1] );
-                case "ReceiveFromProcess":
-                    if( args.Length != 1 ) return false;
-                    return ReceiveFromProcess( (byte[])args[0] );
-                case "Publish":
-                    if( args.Length != 2 ) return false;
-                    return Publish( (byte[])args[0], (byte[])args[1] );
-                case "RegisterEditor":
-                    if( args.Length != 0 ) return false;
-                    return RegisterEditor();
-                case "RegisterReviewer":
-                    if( args.Length != 1 ) return false;
-                    return RegisterReviewer( (byte[])args[0] );
-                default:
-                    return false;
+                if( args.Length != 1 ) return false;
+                return GetProcessStatus( (byte[])args[0] );
             }
+
+            if( operation == "RequestArticle()" )
+            {
+                if( args.Length != 2 ) return false;
+                return RequestArticle( (byte[])args[0], (byte[])args[1] );
+            }
+
+            if( operation == "SendDataToProcess()" )
+            {
+                if( args.Length != 2 ) return false;
+                return SendDataToProcess( (byte[])args[0], (byte[])args[1] );
+            }
+
+            if( operation == "ReceiveFromProcess()" )
+            {
+                if( args.Length != 1 ) return false;
+                return ReceiveFromProcess( (byte[])args[0] );
+            }
+
+            if( operation == "Publish()" )
+            {
+                if( args.Length != 2 ) return false;
+                return Publish( (byte[])args[0], (byte[])args[1] );
+            }
+
+            if( operation == "RegisterEditor()" )
+            {
+                if( args.Length != 0 ) return false;
+                return RegisterEditor();
+            }
+
+            if( operation == "RegisterReviewer()" )
+            {
+                if( args.Length != 1 ) return false;
+                return RegisterReviewer( (byte[])args[0] );
+            }
+
+            return false;
         }
 
-        public static byte GetProcessStatus( byte[] processId )
+        public static byte GetProcessStatus( byte[] processkey )
         {
-            return Storage.Get( Storage.CurrentContext, processId )[0];
+            return Storage.Get( Storage.CurrentContext, processkey )[0];
         }
 
         public static byte[] RequestArticle( byte[] data, byte[] editorAdress )
         {
-            // Iniciando pedido de publicação
+            byte[] autorAdress = ExecutionEngine.CallingScriptHash;
 
-            byte[] publisherAdress = ExecutionEngine.CallingScriptHash;
+            byte[] autorKey = autorPrefix;
+            autorKey.Concat( editorAdress );
+            autorKey = Hash256( autorKey );
 
             byte[] editorKey = editorPrefix;
             editorKey.Concat( editorAdress );
@@ -108,20 +128,26 @@ namespace SciChain
             byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
 
             byte[] processKey = processPrefix;
-            processKey.Concat(Hash256( processes ) ); // unicidade do processo
+            processKey.Concat( Hash256( processes ) );
             processKey.Concat( editorAdress );
-            processKey.Concat( publisherAdress );
+            processKey.Concat( autorAdress );
             processKey = Hash256( processKey );
-
-            Storage.Put( Storage.CurrentContext, processKey, new byte[] { 2 } ); // criado apenas os status
 
             processes.Concat( processKey );
             Storage.Put( Storage.CurrentContext, epKey, processes );
 
+            byte[] processData = new byte[] { 2 }; //status
+            processData.Concat( autorKey );
+            processData.Concat( editorKey );
+            processData.Concat( new byte[] { 0 } ); // número de revisores
+            processData.Concat( data ); // abstract
+
+            Storage.Put( Storage.CurrentContext, processKey, processData );
+
             return processKey;
         }
 
-        public static bool SendDataToProcess( byte[] process, byte[] data )
+        public static bool SendDataToProcess( byte[] processkey, byte[] data )
         {
             byte[] ownAdress = ExecutionEngine.CallingScriptHash;
             // dependendo da parte do processo, essa função vai interpretar de uma forma
@@ -131,7 +157,7 @@ namespace SciChain
             return true;
         }
 
-        public static byte[] ReceiveFromProcess( byte[] process )
+        public static byte[] ReceiveFromProcess( byte[] processkey )
         {
             byte[] ownAdress = ExecutionEngine.CallingScriptHash;
             // dependendo da parte do processo, essa função vai interpretar de uma forma
@@ -141,7 +167,7 @@ namespace SciChain
             return null;
         }
 
-        public static bool Publish( byte[] data, byte[] processId )
+        public static bool Publish( byte[] data, byte[] processkey )
         {
             if( data.Length <= 0 )
             {
@@ -149,7 +175,7 @@ namespace SciChain
                 return false;
             }
 
-            if( GetProcessStatus( processId ) != 5 )
+            if( GetProcessStatus( processkey ) != 5 )
             {
                 Runtime.Notify( "Can't publish" );
                 return false;
@@ -175,10 +201,10 @@ namespace SciChain
 
             for( int i = 0; i < processes.Length; i += 256 )
             {
-                if( processes.Range( i, 256 ) == processId)
+                if( processes.Range( i, 256 ) == processkey )
                 {
                     byte[] publishKey = publishPrefix;
-                    publishKey.Concat( processId );
+                    publishKey.Concat( processkey );
                     publishKey = Hash256( publishKey );
 
                     if( Storage.Get( Storage.CurrentContext, publishKey ).Length >= 0 )
@@ -187,7 +213,7 @@ namespace SciChain
                         return false;
                     }
 
-                    data.Concat( processId );
+                    data.Concat( processkey );
 
                     Storage.Put( Storage.CurrentContext, publishKey, data );
                     return true;
@@ -209,7 +235,7 @@ namespace SciChain
             if ( Storage.Get( Storage.CurrentContext, editorKey ) == editorAdress )
             {
                 Runtime.Notify( "Editor is already registered" );
-                return null;
+                return editorKey;
             }
 
             Storage.Put( Storage.CurrentContext, editorKey, editorAdress );
