@@ -188,7 +188,11 @@ Results ["ByteArray: bytearray(b'\\x02V\\xf0\\xb2\\x14\\x08g\\xb5\\x8b\\xe7\\x83
 
 12) Send Data to Process and, possible, modify it (several tests)
 
-"53656e6444617461546f50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b'3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a',b'\\x02']
+Revisores  APLJBPhtRg2XLhtpxEHd6aRNL7YSLGH2ZL  AXxCjds5Fxy7VSrriDMbCrSRTxpRdvmLtx Status 03
+Data: b'030252eaab8b2aab608902c651912db34de36e7a2b0fb1761b44255107162d3c79680b81b4c8a5efc597'
+
+"53656e6444617461546f50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b'3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a',b'030252eaab8b2aab608902c651912db34de36e7a2b0fb1761b44255107162d3c79680b81b4c8a5efc597']
+"53656e6444617461546f50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b'3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a',"dasdsada"]
 
 
 ======================================================================
