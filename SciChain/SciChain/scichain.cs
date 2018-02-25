@@ -65,38 +65,38 @@ namespace Neo.SmartContract
 
             if( operation == "RequestArticle()" )
             {
-                if( args.Length != 2 ) return false;
-                return RequestArticle( (byte[])args[0], (byte[])args[1] );
+                if( args.Length != 3 ) return false;
+                return RequestArticle( (byte[])args[0], (byte[])args[1], (byte[])args[2] );
             }
 
             if( operation == "SendDataToProcess()" )
             {
-                if( args.Length != 2 ) return false;
-                return SendDataToProcess( (byte[])args[0], (byte[])args[1] );
+                if( args.Length != 3 ) return false;
+                return SendDataToProcess( (byte[])args[0], (byte[])args[1], (byte[])args[2] );
             }
 
             if( operation == "ReceiveFromProcess()" )
             {
-                if( args.Length != 1 ) return false;
-                return ReceiveFromProcess( (byte[])args[0] );
+                if( args.Length != 2 ) return false;
+                return ReceiveFromProcess( (byte[])args[0], (byte[])args[1] );
             }
 
             if( operation == "Publish()" )
             {
                 if( args.Length != 2 ) return false;
-                return Publish( (byte[])args[0] );
+                return Publish( (byte[])args[0], (byte[])args[1] );
             }
 
             if( operation == "RegisterEditor()" )
             {
-                if( args.Length != 0 ) return false;
-                return RegisterEditor();
+                if( args.Length != 1 ) return false;
+                return RegisterEditor( (byte[])args[0] );
             }
 
             if( operation == "RegisterReviewer()" )
             {
-                if( args.Length != 1 ) return false;
-                return RegisterReviewer( (byte[])args[0] );
+                if( args.Length != 2 ) return false;
+                return RegisterReviewer( (byte[])args[0], (byte[])args[1] );
             }
 
             return false;
@@ -107,31 +107,33 @@ namespace Neo.SmartContract
             return Storage.Get( Storage.CurrentContext, processkey )[0];
         }
 
-        public static byte[] RequestArticle( byte[] data, byte[] editorAdress )
+        public static byte[] RequestArticle( byte[] address, byte[] data, byte[] editorAddress )
         {
-            byte[] autorAdress = ExecutionEngine.CallingScriptHash;
+            byte[] autorAddress = address;
 
+            if( !VerifyWitness( autorAddress ) )
+                return null;
 
             byte[] editorKey = editorPrefix;
-            editorKey.Concat( editorAdress );
+            editorKey.Concat( autorAddress );
             editorKey = Hash256( editorKey );
 
-            if( Storage.Get( Storage.CurrentContext, editorKey ) != editorAdress )
+            if( Storage.Get( Storage.CurrentContext, editorKey ) != autorAddress )
             {
                 Runtime.Notify( "Editor not found" );
                 return null;
             }
 
             byte[] epKey = editorProcessPrefix;
-            epKey.Concat( editorAdress );
+            epKey.Concat( editorAddress );
             epKey = Hash256( epKey );
 
             byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
 
             byte[] processKey = processPrefix;
             processKey.Concat( Hash256( processes ) );
-            processKey.Concat( editorAdress );
-            processKey.Concat( autorAdress );
+            processKey.Concat( editorAddress );
+            processKey.Concat( autorAddress );
             processKey = Hash256( processKey );
 
             processes.Concat( processKey );
@@ -139,7 +141,7 @@ namespace Neo.SmartContract
 
             byte[] autorKey = autorPrefix;
             autorKey.Concat( processKey );
-            autorKey.Concat( editorAdress );
+            autorKey.Concat( editorAddress );
             autorKey = Hash256( autorKey );
 
             byte[] processData = new byte[] { 2 }; //status
@@ -153,7 +155,7 @@ namespace Neo.SmartContract
             return processKey;
         }
 
-        public static bool SendDataToProcess( byte[] processkey, byte[] data )
+        public static bool SendDataToProcess( byte[] address, byte[] processkey, byte[] data )
         {
             if ( data.Length == 0 )
             {
@@ -161,7 +163,11 @@ namespace Neo.SmartContract
                 return false;
             }
 
-            byte[] ownAdress = ExecutionEngine.CallingScriptHash;
+            byte[] ownAddress = address;
+
+            if( !VerifyWitness( ownAddress ) )
+                return false;
+
             byte[] processData = Storage.Get( Storage.CurrentContext, processkey );
             byte status = processData[0];
 
@@ -192,7 +198,7 @@ namespace Neo.SmartContract
             if ( status == 2 )
             {
                 byte[] editorKey = editorPrefix;
-                editorKey.Concat( ownAdress );
+                editorKey.Concat( ownAddress );
                 editorKey = Hash256( editorKey );
 
                 if( processData.Range( 33, 32 ) == editorKey )
@@ -221,7 +227,7 @@ namespace Neo.SmartContract
             {
                 byte[] autorKey = autorPrefix;
                 autorKey.Concat( processkey );
-                autorKey.Concat( ownAdress );
+                autorKey.Concat( ownAddress );
                 autorKey = Hash256( autorKey );
 
                 if( processData.Range( 1, 32 ) == autorKey )
@@ -241,7 +247,7 @@ namespace Neo.SmartContract
             {
                 byte[] reviewerKey = reviewerPrefix;
                 reviewerKey.Concat( processkey );
-                reviewerKey.Concat( ownAdress );
+                reviewerKey.Concat( ownAddress );
                 reviewerKey = Hash256( reviewerKey );
 
                 int idx = ( 66 + 32 * processData[65] );
@@ -281,7 +287,7 @@ namespace Neo.SmartContract
             if( status == 5 )
             {
                 byte[] editorKey = editorPrefix;
-                editorKey.Concat( ownAdress );
+                editorKey.Concat( ownAddress );
                 editorKey = Hash256( editorKey );
 
                 if( processData.Range( 33, 32 ) == editorKey )
@@ -314,7 +320,7 @@ namespace Neo.SmartContract
             {
                 byte[] autorKey = autorPrefix;
                 autorKey.Concat( processkey );
-                autorKey.Concat( ownAdress );
+                autorKey.Concat( ownAddress );
                 autorKey = Hash256( autorKey );
 
                 if( processData.Range( 1, 32 ) == autorKey )
@@ -339,7 +345,7 @@ namespace Neo.SmartContract
 
                 byte[] reviewerKey = reviewerPrefix;
                 reviewerKey.Concat( processkey );
-                reviewerKey.Concat( ownAdress );
+                reviewerKey.Concat( ownAddress );
                 reviewerKey = Hash256( reviewerKey );
 
                 int numA = 0;
@@ -366,27 +372,31 @@ namespace Neo.SmartContract
             return false;
         }
 
-        public static byte[] ReceiveFromProcess( byte[] processkey )
+        public static byte[] ReceiveFromProcess( byte[] address, byte[] processkey )
         {
-            byte[] ownAdress = ExecutionEngine.CallingScriptHash;
+            byte[] ownAddress = address;
+
+            if( !VerifyWitness( ownAddress ) )
+                return null;
+
             byte[] processData = Storage.Get( Storage.CurrentContext, processkey );
 
             byte[] autorKey = autorPrefix;
             autorKey.Concat( processkey );
-            autorKey.Concat( ownAdress );
+            autorKey.Concat( ownAddress );
             autorKey = Hash256( autorKey );
 
             if( processData.Range( 1, 32 ) != autorKey )
             {
                 byte[] editorKey = editorPrefix;
-                editorKey.Concat( ownAdress );
+                editorKey.Concat( ownAddress );
                 editorKey = Hash256( editorKey );
 
                 if( processData.Range( 33, 32 ) != editorKey )
                 {
                     byte[] reviewerKey = reviewerPrefix;
                     reviewerKey.Concat( processkey );
-                    reviewerKey.Concat( ownAdress );
+                    reviewerKey.Concat( ownAddress );
                     reviewerKey = Hash256( reviewerKey );
 
                     bool ok = false;
@@ -409,7 +419,7 @@ namespace Neo.SmartContract
             return processData;
         }
 
-        public static bool Publish( byte[] processkey )
+        public static bool Publish( byte[] address, byte[] processkey )
         {
             if( GetProcessStatus( processkey ) != 8 )
             {
@@ -417,20 +427,23 @@ namespace Neo.SmartContract
                 return false;
             }
 
-            byte[] editorAdress = ExecutionEngine.CallingScriptHash;
+            byte[] editorAddress = address;
+
+            if( !VerifyWitness( editorAddress ) )
+                return false;
 
             byte[] editorKey = editorPrefix;
-            editorKey.Concat( editorAdress );
+            editorKey.Concat( editorAddress );
             editorKey = Hash256( editorKey );
 
-            if( Storage.Get( Storage.CurrentContext, editorKey ) != editorAdress )
+            if( Storage.Get( Storage.CurrentContext, editorKey ) != editorAddress )
             {
                 Runtime.Notify( "Not an Editor" );
                 return false;
             }
 
             byte[] epKey = editorProcessPrefix;
-            epKey.Concat( editorAdress );
+            epKey.Concat( editorAddress );
             epKey = Hash256( epKey );
 
             byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
@@ -458,35 +471,41 @@ namespace Neo.SmartContract
             return false;
         }
 
-        public static byte[] RegisterEditor()
+        public static byte[] RegisterEditor( byte[] address )
         {
-            byte[] editorAdress = ExecutionEngine.CallingScriptHash;
+            byte[] editorAddress = address;
+
+            if( !VerifyWitness( editorAddress ) )
+                return null;
 
             byte[] editorKey = editorPrefix;
-            editorKey.Concat( editorAdress );
+            editorKey.Concat( editorAddress );
             editorKey = Hash256( editorKey );
 
-            if ( Storage.Get( Storage.CurrentContext, editorKey ) == editorAdress )
+            if ( Storage.Get( Storage.CurrentContext, editorKey ) == editorAddress )
             {
                 Runtime.Notify( "Editor is already registered" );
                 return editorKey;
             }
 
-            Storage.Put( Storage.CurrentContext, editorKey, editorAdress );
+            Storage.Put( Storage.CurrentContext, editorKey, editorAddress );
             Runtime.Notify( "Editor registered" );
 
             return editorKey;
         }
 
-        public static bool RegisterReviewer( byte[] ReviewerAdress )
+        public static bool RegisterReviewer( byte[] address, byte[] ReviewerAddress )
         {
-            byte[] editorAdress = ExecutionEngine.CallingScriptHash;
+            byte[] editorAddress = address;
+
+            if( !VerifyWitness( editorAddress ) )
+                return false;
 
             byte[] editorKey = editorPrefix;
-            editorKey.Concat( editorAdress );
+            editorKey.Concat( editorAddress );
             editorKey = Hash256( editorKey );
 
-            if ( Storage.Get( Storage.CurrentContext, editorKey ) != editorAdress )
+            if ( Storage.Get( Storage.CurrentContext, editorKey ) != editorAddress )
             {
                 Runtime.Notify( "Not an Editor" );
                 return false;
@@ -500,18 +519,26 @@ namespace Neo.SmartContract
 
             for( int i = 0; i < reviewers.Length; i += 32 )
             {
-                if( reviewers.Range( i, 32 ) == ReviewerAdress )
+                if( reviewers.Range( i, 32 ) == ReviewerAddress )
                 {
                     Runtime.Notify( "Reviwer already registered" );
                     return false;
                 }  
             }
 
-            reviewers.Concat( ReviewerAdress );
+            reviewers.Concat( ReviewerAddress );
 
             Storage.Put( Storage.CurrentContext, reviewersKey, reviewers );
             Runtime.Notify( "Reviewer registered" );
             return true;
+        }
+
+        private static bool VerifyWitness( byte[] address )
+        {
+            bool ok = Runtime.CheckWitness( address );
+            if( !ok )
+                Runtime.Notify( "You are not the address" );
+            return ok;
         }
     }
 }
