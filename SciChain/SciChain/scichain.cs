@@ -226,7 +226,7 @@ namespace Neo.SmartContract
 
 
                 processData[0] = data[0];
-                processData.Concat( data.Range( 1, data.Length - 1 ) ); // colocando os dados dos revisores ( número de revisores ( 1 byte ) + conjunto de 32 bytes a key de cada editor
+                processData = processData.Concat( data.Range( 1, data.Length - 1 ) ); // colocando os dados dos revisores ( número de revisores ( 1 byte ) + conjunto de 32 bytes a key de cada editor
                 Storage.Put( Storage.CurrentContext, processkey, processData );
 
                 return true;
@@ -245,8 +245,8 @@ namespace Neo.SmartContract
                 }
 
                 processData[0] = 4;
-                processData.Concat( new byte[] { 0 } ); // um byte contador de avaliações
-                processData.Concat( data ); // enviando a chave simétrica criptografada com a chave publica de cada revisor + artigo criptografado com a chave simétrica
+                processData = processData.Concat( new byte[] { 0 } ); // um byte contador de avaliações
+                processData = processData.Concat( data ); // enviando a chave simétrica criptografada com a chave publica de cada revisor + artigo criptografado com a chave simétrica
                 Storage.Put( Storage.CurrentContext, processkey, processData );
                 return true;
             }
@@ -254,7 +254,7 @@ namespace Neo.SmartContract
             if( status == 4 )
             {
                 byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
-                reviewerKey.Concat( ownAddress );
+                reviewerKey = reviewerKey.Concat( ownAddress );
                 reviewerKey = Hash256( reviewerKey );
 
                 int idx = ( 66 + 32 * processData[65] );
@@ -263,7 +263,7 @@ namespace Neo.SmartContract
                     if( processData.Range( i, 32 ) == reviewerKey )
                     {
                         byte[] reviewerCommentsKey = processkey.Concat("ReviewerComments".AsByteArray());
-                        reviewerCommentsKey.Concat( reviewerKey );
+                        reviewerCommentsKey = reviewerCommentsKey.Concat( reviewerKey );
                         reviewerCommentsKey = Hash256( reviewerCommentsKey );
 
                         byte[] reviewerComments = Storage.Get( Storage.CurrentContext, reviewerCommentsKey );
@@ -315,7 +315,7 @@ namespace Neo.SmartContract
                 for( int i = 0; i < len; ++i )
                     numApproval.Concat( new byte[] { 0 } );
 
-                processData.Concat( numApproval ); // adicionando campos para os revisores avaliarem se o artigo que o author colocará sem criptografia foi o mesmo que eles avaliaram.
+                processData = processData.Concat( numApproval ); // adicionando campos para os revisores avaliarem se o artigo que o author colocará sem criptografia foi o mesmo que eles avaliaram.
                                                    // 1 não aprovado e 2 aprovado
                 Storage.Put( Storage.CurrentContext, processkey, processData );
                 return true;
@@ -324,7 +324,7 @@ namespace Neo.SmartContract
             if( status == 6 )
             {
                 byte[] authorKey = processkey.Concat("Author".AsByteArray());
-                authorKey.Concat( ownAddress );
+                authorKey = authorKey.Concat( ownAddress );
                 authorKey = Hash256( authorKey );
 
                 if( processData.Range( 1, 32 ) == authorKey )
@@ -334,7 +334,7 @@ namespace Neo.SmartContract
                 }
 
                 processData[0] = 7;
-                processData.Concat( data ); // artigo descriptografado
+                processData = processData.Concat( data ); // artigo descriptografado
                 Storage.Put( Storage.CurrentContext, processkey, processData );
                 return true;
             }
@@ -348,7 +348,7 @@ namespace Neo.SmartContract
                 }
 
                 byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
-                reviewerKey.Concat( ownAddress );
+                reviewerKey = reviewerKey.Concat( ownAddress );
                 reviewerKey = Hash256( reviewerKey );
 
                 int numA = 0;
@@ -385,7 +385,7 @@ namespace Neo.SmartContract
             byte[] processData = Storage.Get( Storage.CurrentContext, processkey );
 
             byte[] authorKey = processkey.Concat("Author".AsByteArray());
-            authorKey.Concat( ownAddress );
+            authorKey = authorKey.Concat( ownAddress );
             authorKey = Hash256( authorKey );
 
             if( processData.Range( 1, 32 ) != authorKey )
@@ -396,7 +396,7 @@ namespace Neo.SmartContract
                 if ( processData.Range( 33, 32 ) != editorKey )
                 {
                     byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
-                    reviewerKey.Concat( ownAddress );
+                    reviewerKey = reviewerKey.Concat( ownAddress );
                     reviewerKey = Hash256( reviewerKey );
 
                     bool ok = false;
@@ -625,10 +625,10 @@ namespace Neo.SmartContract
             if( !ok )
             {
                 byte[] sk = toaddress.Concat("endorseSkill".AsByteArray());
-                sk.Concat( skill );
+                sk = sk.Concat( skill );
                 sk = Hash256( sk );
                 Storage.Put( Storage.CurrentContext, sk, address );
-                receiverSkills.Concat( sk );
+                receiverSkills = receiverSkills.Concat( sk );
                 Storage.Put( Storage.CurrentContext, Storage.Get( Storage.CurrentContext, receiverData.Range( 32, 32 ) ), receiverSkills);
             }
 
@@ -638,13 +638,13 @@ namespace Neo.SmartContract
 
             if( receiverlvl.Length <= senderlvl.Length )
             {
-                receiverLvlCount.Concat( new byte[] { 0 } );// subiu um no contador de lvl
+                receiverLvlCount = receiverLvlCount.Concat( new byte[] { 0 } );// subiu um no contador de lvl
             }
 
             if( receiverLvlCount.Length == receiverlvl.Length )
             {
                 receiverLvlCount = new byte[] { };
-                receiverlvl.Concat( new byte[] { 0 } );
+                receiverlvl = receiverlvl.Concat( new byte[] { 0 } );
             }
 
             Storage.Put( Storage.CurrentContext, Storage.Get( Storage.CurrentContext, receiverData.Range( 64, 32 ) ), receiverLvlCount );
@@ -652,7 +652,7 @@ namespace Neo.SmartContract
 
             byte[] data = Storage.Get( Storage.CurrentContext, smartContractScriptHash );
             byte[] newData = address.Concat( toaddress );
-            data.Concat( newData );
+            data = data.Concat( newData );
             Storage.Put( Storage.CurrentContext, smartContractScriptHash, data );
 
             return true;
