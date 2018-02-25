@@ -485,6 +485,7 @@ namespace Neo.SmartContract
             if (!Runtime.CheckWitness(editorAddress)) return null;
 
             byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
+            editorKey = Hash256( editorKey );
 
             if ( Storage.Get( Storage.CurrentContext, editorKey ) == editorAddress )
             {
@@ -505,6 +506,7 @@ namespace Neo.SmartContract
             if (!Runtime.CheckWitness(editorAddress)) return false;
 
             byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
+            editorKey = Hash256( editorKey );
 
             if ( Storage.Get( Storage.CurrentContext, editorKey ) != editorAddress )
             {
@@ -520,7 +522,7 @@ namespace Neo.SmartContract
             {
                 if( reviewers.Range( i, 32 ) == ReviewerAddress )
                 {
-                    Runtime.Notify( "Reviwer already registered" );
+                    Runtime.Notify( "Reviewer already registered" );
                     return false;
                 }
             }
