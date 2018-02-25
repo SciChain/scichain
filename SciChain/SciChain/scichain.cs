@@ -482,12 +482,9 @@ namespace Neo.SmartContract
         {
             byte[] editorAddress = address;
 
-            if( !Runtime.CheckWitness( editorAddress ) )
-                return null;
+            if (!Runtime.CheckWitness(editorAddress)) return null;
 
-            byte[] editorKey = editorPrefix;
-            editorKey.Concat( editorAddress );
-            editorKey = Hash256( editorKey );
+            byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
 
             if ( Storage.Get( Storage.CurrentContext, editorKey ) == editorAddress )
             {
@@ -505,12 +502,9 @@ namespace Neo.SmartContract
         {
             byte[] editorAddress = address;
 
-            if( !VerifyWitness( editorAddress ) )
-                return false;
+            if (!Runtime.CheckWitness(editorAddress)) return null;
 
-            byte[] editorKey = editorPrefix;
-            editorKey.Concat( editorAddress );
-            editorKey = Hash256( editorKey );
+            byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
 
             if ( Storage.Get( Storage.CurrentContext, editorKey ) != editorAddress )
             {
@@ -518,9 +512,7 @@ namespace Neo.SmartContract
                 return false;
             }
 
-            byte[] reviewersKey = reviewersPrefix;
-            reviewersKey.Concat( editorKey );
-            reviewersKey = Hash256( reviewersKey );
+            byte[] reviewersKey = editorAddress.Concat("reviewerssAddress".AsByteArray());
 
             byte[] reviewers = Storage.Get( Storage.CurrentContext, reviewersKey );
 
