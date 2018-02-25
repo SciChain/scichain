@@ -387,10 +387,15 @@ namespace Neo.SmartContract
                 return null;
 
             byte[] processData = Storage.Get( Storage.CurrentContext, processkey );
-
+            Runtime.Notify("restoring processKey => processData: ");
+            Runtime.Notify(processData);
+            
             byte[] authorKey = processkey.Concat("Author".AsByteArray());
             authorKey = authorKey.Concat( ownAddress );
             authorKey = Hash256( authorKey );
+            Runtime.Notify("authorKey: ");
+            Runtime.Notify(authorKey);
+
 
             if( processData.Range( 1, 32 ) != authorKey )
             {
