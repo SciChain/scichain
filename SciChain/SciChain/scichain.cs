@@ -545,23 +545,22 @@ namespace Neo.SmartContract
 
             /* adicionando o revisor no ranking */
             /* lvl hash */
-            byte[] lvlhash = endorseLvlPrefix;
-            lvlhash.Concat( ReviewerAddress );
+            byte[] lvlhash = ReviewerAddress.Concat("endorseLvl".AsByteArray());
             lvlhash = Hash256( lvlhash );
 
             /* hash skills count */
-            byte[] skillscounthash = endorseCountPrefix;
-            skillscounthash.Concat( ReviewerAddress );
+            byte[] skillscounthash = ReviewerAddress.Concat("endorseCount".AsByteArray());
             skillscounthash = Hash256( skillscounthash );
 
             /* hash skills count */
-            byte[] lvlcounthash = endorseLvlCountPrefix;
-            lvlcounthash.Concat( ReviewerAddress );
+            byte[] lvlcounthash = ReviewerAddress.Concat("endorseLvlCount".AsByteArray());
             lvlcounthash = Hash256( lvlcounthash );
 
-            byte[] endorseData = lvlhash;
-            endorseData.Concat( skillscounthash) ;
-            endorseData.Concat( lvlcounthash );
+            byte[] endorseData = = new byte[] {};
+            endorseData = endorseData.Concat( lvlhash);
+            //byte[] endorseData = lvlhash;
+            endorseData = endorseData.Concat( skillscounthash) ;
+            endorseData = endorseData.Concat( lvlcounthash );
             Storage.Put( Storage.CurrentContext, address, endorseData );
 
             return true;
