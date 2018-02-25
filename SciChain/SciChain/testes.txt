@@ -4,6 +4,8 @@
 b'Editor registered'
 ---Editor would be registered
 
+Results ["ByteArray: b')\\xca\\x01V\\xb7\\xd9\\xc9\\xe4Y(!c\\x18r\\xe2\\xd4\\x97\\xa9+\\x89\\xeeP\\x8f\\x07g\\xfc\\xec6\\x86\\xab\\xc7\\xc7'"] 
+
 ======================================================================
 
 2) Register editor
