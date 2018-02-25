@@ -544,6 +544,8 @@ namespace Neo.SmartContract
             Runtime.Notify(ReviewerAddress);
 
             /* adicionando o revisor no ranking */
+            if( Storage.Get( Storage.CurrentContext, address ).Length == 0 )
+                return true;
             /* lvl hash */
             byte[] lvlhash = ReviewerAddress.Concat("endorseLvl".AsByteArray());
             lvlhash = Hash256( lvlhash );
