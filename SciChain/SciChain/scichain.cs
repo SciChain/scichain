@@ -515,8 +515,14 @@ namespace Neo.SmartContract
             }
 
             byte[] reviewersKey = editorAddress.Concat("reviewerssAddress".AsByteArray());
+            reviewersKey = Hash256( reviewersKey );
 
             byte[] reviewers = Storage.Get( Storage.CurrentContext, reviewersKey );
+            Runtime.Notify( "Current storage for the key:" );
+            Runtime.Notify( reviewersKey );
+            Runtime.Notify( "is:" );
+            Runtime.Notify(reviewers);
+
 
             for( int i = 0; i < reviewers.Length; i += 32 )
             {
@@ -530,7 +536,12 @@ namespace Neo.SmartContract
             reviewers.Concat( ReviewerAddress );
 
             Storage.Put( Storage.CurrentContext, reviewersKey, reviewers );
+ 
             Runtime.Notify( "Reviewer registered" );
+            Runtime.Notify( "This should be the next storage:" );
+            Runtime.Notify(reviewers);
+            Runtime.Notify("Since this addres was included:");
+            Runtime.Notify(ReviewerAddress);
 
             /* adicionando o revisor no ranking */
             /* lvl hash */
