@@ -524,9 +524,9 @@ namespace Neo.SmartContract
             Runtime.Notify(reviewers);
 
 
-            for( int i = 0; i < reviewers.Length; i += 32 )
+            for( int i = 0; i < reviewers.Length; i += 20 )
             {
-                if( reviewers.Range( i, 32 ) == ReviewerAddress )
+                if( reviewers.Range( i, 20 ) == ReviewerAddress )
                 {
                     Runtime.Notify( "Reviewer already registered" );
                     return false;

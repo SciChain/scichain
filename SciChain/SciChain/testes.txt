@@ -95,13 +95,38 @@ b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9' #b'23ba2703c53263e8d6e
 6) Register reviewer (with a wrong editor)
 
 "526567697374657252657669657765722829" ["AQaJZTKshTQzcCKmsaoNVrtSP1pEB3Utn9","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
----It would notify that it was not an Editor (failed checkwitness)
+---It would notify that it was not the Editor in charge (failed checkwitness)
 
 
 Results ["ByteArray: bytearray(b'\\x00')"] 
 
 
 ======================================================================
+
+7) Register reviewer
+
+"526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+
+b'Current storage for the key:']
+b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
+b'is:']
+b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
+b'Reviewer registered']
+b'This should be the next storage:']
+b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
+b'Since this addres was included:']
+b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
+2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'Current storage for the key:']
+2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
+2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'is:']
+2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
+2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'Reviewer registered']
+2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'This should be the next storage:']
+2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
+2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'Since this addres was included:']
+2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
+
+
 
 
 
