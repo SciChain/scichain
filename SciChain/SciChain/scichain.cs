@@ -131,31 +131,31 @@ namespace Neo.SmartContract
             Runtime.Notify(processes);
 
             byte[] processKey = Hash256(processes).Concat("Process".AsByteArray());
-            processKey.Concat(editorAddress);
-            processKey.Concat(authorAddress);
+            processKey = processKey.Concat(editorAddress);
+            processKey = processKey.Concat(authorAddress);
             processKey = Hash256(processKey);
 
             Runtime.Notify("middle processKey:");
             Runtime.Notify(processKey);
 
-            processes.Concat( processKey );
+            processes = processes.Concat( processKey );
             Storage.Put( Storage.CurrentContext, epKey, processes );
 
             Runtime.Notify("epKey => processes: ");
             Runtime.Notify(processes);
 
             byte[] authorKey = processKey.Concat("Author".AsByteArray());
-            authorKey.Concat( editorAddress );
+            authorKey = authorKey.Concat( editorAddress );
             authorKey = Hash256( authorKey );
 
             Runtime.Notify("authorKey:");
             Runtime.Notify(authorKey);
 
             byte[] processData = new byte[] { 2 }; //status
-            processData.Concat( authorKey );
-            processData.Concat( editorKey );
-            processData.Concat( new byte[] { 0 } ); // número de revisores
-            processData.Concat( data ); // abstract
+            processes = processData.Concat( authorKey );
+            processes = processData.Concat( editorKey );
+            processes = processData.Concat( new byte[] { 0 } ); // número de revisores
+            processes = processData.Concat( data ); // abstract
 
             Runtime.Notify("processKey => processData: ");
             Runtime.Notify(processData);
