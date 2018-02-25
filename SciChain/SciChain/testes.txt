@@ -1,20 +1,106 @@
-Register editor
+1) Register editor
 "5265676973746572456469746f722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+
+b'Editor registered'
 ---Editor would be registered
+
+======================================================================
+
+2) Register editor
 
 "5265676973746572456469746f722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 ---It would say that editor was already registered
 
+b'Editor is already registered'
 
-Register reviewer
+
+======================================================================
+
+3) Register reviewer
+
 "526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","APLJBPhtRg2XLhtpxEHd6aRNL7YSLGH2ZL"]
 ---Reviewer should be registered
+
+b'Current storage for the key:']
+b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
+b'is:']
+b'']
+b'Reviewer registered']
+b'This should be the next storage:']
+b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f']
+b'Since this addres was included:']
+b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f']
+2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'Current storage for the key:']
+2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
+2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'is:']
+2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'']
+2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'Reviewer registered']
+2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'This should be the next storage:']
+2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f']
+2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'Since this addres was included:']
+2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f']
+
+
+======================================================================
+
+4) Register reviewer
 
 "526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","APLJBPhtRg2XLhtpxEHd6aRNL7YSLGH2ZL"]
 ---It would say that reviewer was already registered
 
+
+b'Current storage for the key:']
+b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
+b'is:']
+b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f']
+b'Reviewer already registered']
+2c0] [tx f354786139cceb878a6b07b4c3e7774e5ba447159a64a9b40bf5bd0ac82bd38c] [b'Current storage for the key:']
+2c0] [tx f354786139cceb878a6b07b4c3e7774e5ba447159a64a9b40bf5bd0ac82bd38c] [b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
+2c0] [tx f354786139cceb878a6b07b4c3e7774e5ba447159a64a9b40bf5bd0ac82bd38c] [b'is:']
+2c0] [tx f354786139cceb878a6b07b4c3e7774e5ba447159a64a9b40bf5bd0ac82bd38c] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f']
+2c0] [tx f354786139cceb878a6b07b4c3e7774e5ba447159a64a9b40bf5bd0ac82bd38c] [b'Reviewer already registered']
+
+
+
+======================================================================
+
+5) Register reviewer
+
 "526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 ---Another reviewer should be registered
 
+b'Current storage for the key:']
+b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
+b'is:']
+b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f']
+b'Reviewer registered']
+b'This should be the next storage:']
+b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
+b'Since this addres was included:']
+b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
+2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'Current storage for the key:']
+2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
+2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'is:']
+2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f']
+2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'Reviewer registered']
+2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'This should be the next storage:']
+2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
+2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'Since this addres was included:']
+2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
+
+
+======================================================================
+
+6) Register reviewer (with a wrong editor)
+
 "526567697374657252657669657765722829" ["AQaJZTKshTQzcCKmsaoNVrtSP1pEB3Utn9","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
----It would notify that it was not an Editor
+---It would notify that it was not an Editor (failed checkwitness)
+
+
+Results ["ByteArray: bytearray(b'\\x00')"] 
+
+
+======================================================================
+
+
+
