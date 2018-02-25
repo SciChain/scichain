@@ -100,6 +100,10 @@ namespace Neo.SmartContract
             return Storage.Get( Storage.CurrentContext, processkey )[0];
         }
 
+        /*First steps of a manuscript submission
+         recieves WIF address of main author, abstract and WIF of the editor that will handle it
+         verifies if Editor is registered and returns the processKey with abstract and both publicKeys
+        */ 
         public static byte[] RequestArticle( byte[] address, byte[] data, byte[] editorAddress )
         {
             byte[] authorAddress = address;
