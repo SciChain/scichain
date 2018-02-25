@@ -502,7 +502,7 @@ namespace Neo.SmartContract
         {
             byte[] editorAddress = address;
 
-            if (!Runtime.CheckWitness(editorAddress)) return null;
+            if (!Runtime.CheckWitness(editorAddress)) return false;
 
             byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
 
