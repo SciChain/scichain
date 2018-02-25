@@ -134,7 +134,6 @@ namespace Neo.SmartContract
             Runtime.Notify(epKey);
 
             byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
-
             Runtime.Notify("processes:");
             Runtime.Notify(processes);
 
@@ -189,6 +188,11 @@ namespace Neo.SmartContract
             byte[] processData = Storage.Get( Storage.CurrentContext, processkey );
             byte status = processData[0];
 
+            Runtime.Notify("restaured processKey => processData: ");
+            Runtime.Notify(processData);
+            Runtime.Notify("status is:");
+            Runtime.Notify(status);
+
             if( status == 0 )
             {
                 Runtime.Notify( "Can't send data to a undocumented process key" );
@@ -218,7 +222,7 @@ namespace Neo.SmartContract
                 byte[] editorKey = ownAddress.Concat("editorAddress".AsByteArray());
                 editorKey = Hash256(editorKey);
 
-                if ( processData.Range( 33, 32 ) == editorKey )
+                if ( processData.Range( 33, 32 ) != editorKey )
                 {
                     Runtime.Notify( "Not the article editor" );
                     return false;
@@ -231,7 +235,8 @@ namespace Neo.SmartContract
                 }
 
                 processData = processData.Range( 0, 65 );
-
+                Runtime.Notify("data:");
+                Runtime.Notify(data);
 
                 processData[0] = data[0];
                 processData = processData.Concat( data.Range( 1, data.Length - 1 ) ); // colocando os dados dos revisores ( número de revisores ( 1 byte ) + conjunto de 32 bytes a key de cada editor
@@ -403,6 +408,7 @@ namespace Neo.SmartContract
 
             if( processData.Range( 1, 32 ) != authorKey )
             {
+                Runtime.Notify( "Right author key" );
                 byte[] editorKey = ownAddress.Concat("editorAddress".AsByteArray());
                 editorKey = Hash256(editorKey);
 
