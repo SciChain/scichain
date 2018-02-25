@@ -117,7 +117,7 @@ namespace Neo.SmartContract
             Runtime.Notify("using editorKey:");
             Runtime.Notify(editorKey);
 
-            if ( Storage.Get( Storage.CurrentContext, editorKey ) != authorAddress )
+            if ( Storage.Get( Storage.CurrentContext, editorKey ) != editorAddress )
             {
                 Runtime.Notify( "Editor not found" );
                 return null;

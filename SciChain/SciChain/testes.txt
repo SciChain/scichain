@@ -162,7 +162,24 @@ b'3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a'
 
 ======================================================================
 
+11) Get process status
 
+"47657450726f636573735374617475732829" ["=\\xc7^\\x81\\x011\\xdc\\xd3\\x86\\xdb\\x94\\xf4V\\xb8\\xba\\x9f#\\x05\\xe0\\xb7q\\xe4ge9\\xeb[\\x98\\xad\\xa6\\xa1J"]
 
+Results ["ByteArray: bytearray(b'')"] 
 
+======================================================================
+
+12) Recieve from process
+
+"5265636569766546726f6d50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","=\\xc7^\\x81\\x011\\xdc\\xd3\\x86\\xdb\\x94\\xf4V\\xb8\\xba\\x9f#\\x05\\xe0\\xb7q\\xe4ge9\\xeb[\\x98\\xad\\xa6\\xa1J"]
+
+b'Access denied']
+7f1] [tx 79788ff944a6cba9466711d8d32d1b3f196d0d5d0f4e781b9154f7bbb5dd6ad6] [b'Access denied']
+
+======================================================================
+
+12) Send Data to Process and, possible, modify it (several tests)
+
+======================================================================
 
