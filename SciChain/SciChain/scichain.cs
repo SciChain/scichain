@@ -17,7 +17,7 @@ using System.Linq;
          * waiting_reviewers_approval 7
          * Waiting_for_publication  8
          * Published 9
-      
+
     1: key do autor/autores ( 32 bytes )
     2: key do editor ( 32 bytes )
     3: número de revisores ( 1 byte )
@@ -222,7 +222,7 @@ namespace Neo.SmartContract
 
                 processData = processData.Range( 0, 65 );
 
-                
+
                 processData[0] = data[0];
                 processData.Concat( data.Range( 1, data.Length - 1 ) ); // colocando os dados dos revisores ( número de revisores ( 1 byte ) + conjunto de 32 bytes a key de cada editor
                 Storage.Put( Storage.CurrentContext, processkey, processData );
@@ -316,7 +316,7 @@ namespace Neo.SmartContract
                 byte[] numApproval = new byte[] { };
                 for( int i = 0; i < len; ++i )
                     numApproval.Concat( new byte[] { 0 } );
-                
+
                 processData.Concat( numApproval ); // adicionando campos para os revisores avaliarem se o artigo que o autor colocará sem criptografia foi o mesmo que eles avaliaram.
                                                    // 1 não aprovado e 2 aprovado
                 Storage.Put( Storage.CurrentContext, processkey, processData );
@@ -420,7 +420,7 @@ namespace Neo.SmartContract
                         Runtime.Notify( "Access denied" );
                         return null;
                     }
-                }   
+                }
             }
 
             return processData;
@@ -482,7 +482,7 @@ namespace Neo.SmartContract
         {
             byte[] editorAddress = address;
 
-            if( !VerifyWitness( editorAddress ) )
+            if( !Runtime.CheckWitness( editorAddress ) )
                 return null;
 
             byte[] editorKey = editorPrefix;
@@ -530,7 +530,7 @@ namespace Neo.SmartContract
                 {
                     Runtime.Notify( "Reviwer already registered" );
                     return false;
-                }  
+                }
             }
 
             reviewers.Concat( ReviewerAddress );
