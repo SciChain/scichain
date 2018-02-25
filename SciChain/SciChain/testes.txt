@@ -30,15 +30,6 @@ b'This should be the next storage:' #reviewers
 b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f' #b'52eaab8b2aab608902c651912db34de36e7a2b0f'
 b'Since this addres was included:' #ReviewerAddress
 b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f' #b'52eaab8b2aab608902c651912db34de36e7a2b0f'
-2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'Current storage for the key:']
-2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
-2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'is:']
-2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'']
-2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'Reviewer registered']
-2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'This should be the next storage:']
-2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f']
-2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'Since this addres was included:']
-2c0] [tx c6f7d1ea28a87a3d4ea83b601b6dc06f2951e6deadfff232aef462f8e52f77ea] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f']
 
 
 ======================================================================
@@ -54,12 +45,6 @@ b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f
 b'is:' # reviewers
 b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f' #b'52eaab8b2aab608902c651912db34de36e7a2b0f'
 b'Reviewer already registered'
-
-2c0] [tx f354786139cceb878a6b07b4c3e7774e5ba447159a64a9b40bf5bd0ac82bd38c] [b'Current storage for the key:']
-2c0] [tx f354786139cceb878a6b07b4c3e7774e5ba447159a64a9b40bf5bd0ac82bd38c] [b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
-2c0] [tx f354786139cceb878a6b07b4c3e7774e5ba447159a64a9b40bf5bd0ac82bd38c] [b'is:']
-2c0] [tx f354786139cceb878a6b07b4c3e7774e5ba447159a64a9b40bf5bd0ac82bd38c] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f']
-2c0] [tx f354786139cceb878a6b07b4c3e7774e5ba447159a64a9b40bf5bd0ac82bd38c] [b'Reviewer already registered']
 
 
 
@@ -79,15 +64,6 @@ b'This should be the next storage:'
 b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9' #b'52eaab8b2aab608902c651912db34de36e7a2b0f23ba2703c53263e8d6e522dc32203339dcd8eee9'
 b'Since this addres was included:'
 b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9' #b'23ba2703c53263e8d6e522dc32203339dcd8eee9'
-2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'Current storage for the key:']
-2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
-2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'is:']
-2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f']
-2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'Reviewer registered']
-2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'This should be the next storage:']
-2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
-2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'Since this addres was included:']
-2c0] [tx c072a4257bf0ec769e7871d0a29210d784e61535d93caa762582ff76253b7dc2] [b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
 
 
 ======================================================================
@@ -107,26 +83,44 @@ Results ["ByteArray: bytearray(b'\\x00')"]
 
 "526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 
-b'Current storage for the key:']
-b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
-b'is:']
-b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
-b'Reviewer registered']
-b'This should be the next storage:']
-b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
-b'Since this addres was included:']
-b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
-2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'Current storage for the key:']
-2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J']
-2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'is:']
-2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
-2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'Reviewer registered']
-2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'This should be the next storage:']
-2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
-2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'Since this addres was included:']
-2c0] [tx fe7bb298bd378c4d2c639982ccfecba2cbe2789ac90acfcb73c23ba72f5e6155] [b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9']
+b'Current storage for the key:'
+b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J'
+b'is:'
+b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9'
+b'Reviewer already registered'
 
 
+======================================================================
+
+8) Register reviewer
+
+"526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","AXxCjds5Fxy7VSrriDMbCrSRTxpRdvmLtx"]
+
+b'Current storage for the key:'
+b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J' #b'057ba8e363413758ced374e55786888bf1b969ed33ee15dbf63e7fbfa056d84a'
+b'is:'
+b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9' #b'52eaab8b2aab608902c651912db34de36e7a2b0f23ba2703c53263e8d6e522dc32203339dcd8eee9'
+b'Reviewer registered'
+b'This should be the next storage:'
+b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9\xb1v\x1bD%Q\x07\x16-<yh\x0b\x81\xb4\xc8\xa5\xef\xc5\x97' #b'52eaab8b2aab608902c651912db34de36e7a2b0f23ba2703c53263e8d6e522dc32203339dcd8eee9b1761b44255107162d3c79680b81b4c8a5efc597'
+
+b'Since this addres was included:'
+b'\xb1v\x1bD%Q\x07\x16-<yh\x0b\x81\xb4\xc8\xa5\xef\xc5\x97' #b'b1761b44255107162d3c79680b81b4c8a5efc597'
+
+Results ['Integer: 1 '] 
+
+======================================================================
+
+9) Register reviewer (with a wrong wallet) (w4)
+
+"526567697374657252657669657765722829" ["AQaJZTKshTQzcCKmsaoNVrtSP1pEB3Utn9","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+---It would notify that it was not the Editor in charge 
+
+b'Not an Editor'
+
+Results ["ByteArray: bytearray(b'\\x00')"] 
+
+======================================================================
 
 
 
