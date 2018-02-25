@@ -97,7 +97,11 @@ namespace Neo.SmartContract
 
         public static byte GetProcessStatus( byte[] processkey )
         {
-            return Storage.Get( Storage.CurrentContext, processkey )[0];
+            byte[] processData = Storage.Get( Storage.CurrentContext, processkey );
+            Runtime.Notify("restoring processKey => processData: ");
+            Runtime.Notify(processData);
+            
+            return processData[0];
         }
 
         /*First steps of a manuscript submission
