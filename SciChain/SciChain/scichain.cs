@@ -556,7 +556,7 @@ namespace Neo.SmartContract
             byte[] lvlcounthash = ReviewerAddress.Concat("endorseLvlCount".AsByteArray());
             lvlcounthash = Hash256( lvlcounthash );
 
-            byte[] endorseData = = new byte[] {};
+            byte[] endorseData = new byte[] {};
             endorseData = endorseData.Concat( lvlhash);
             //byte[] endorseData = lvlhash;
             endorseData = endorseData.Concat( skillscounthash) ;
