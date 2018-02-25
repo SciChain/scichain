@@ -533,7 +533,7 @@ namespace Neo.SmartContract
                 }
             }
 
-            reviewers.Concat( ReviewerAddress );
+            reviewers=reviewers.Concat( ReviewerAddress );
 
             Storage.Put( Storage.CurrentContext, reviewersKey, reviewers );
  

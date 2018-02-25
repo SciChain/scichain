@@ -1,16 +1,20 @@
 Register editor
 "5265676973746572456469746f722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+---Editor would be registered
 
-Register editor
 "5265676973746572456469746f722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
-
+---It would say that editor was already registered
 
 
 Register reviewer
 "526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","APLJBPhtRg2XLhtpxEHd6aRNL7YSLGH2ZL"]
+---Reviewer should be registered
 
-Register reviewer
 "526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","APLJBPhtRg2XLhtpxEHd6aRNL7YSLGH2ZL"]
+---It would say that reviewer was already registered
 
+"526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+---Another reviewer should be registered
 
-
+"526567697374657252657669657765722829" ["AQaJZTKshTQzcCKmsaoNVrtSP1pEB3Utn9","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+---It would notify that it was not an Editor
