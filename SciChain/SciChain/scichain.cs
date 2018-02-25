@@ -4,15 +4,7 @@ using Neo.SmartContract.Framework.Services.System;
 using System;
 using System.Linq;
 
-/* Etapas:
-        1 - Escritor envia um abstract para um editor
-        2 - Editor aceita ou rejeita. Caso ele aceite, ele envia as public keys dos revisores para o escritor e o hash do processo.
-        3 - O escritor envia o artigo criptografado em todas as publics keys e junto envia sua public key para o editor.
-        4 - O editor envia os arquivos para cada revisor junto com a public key do escritor
-        5 - Se ó artigo passar pelo critério ele é publicado com a assinatura do escritor, editor e revisores
-        6 - Se o artigo for rejeitado, voltamos a etapa 3.
-
-
+/*
     Lista de dados:
     0: status ( 1 byte ) :
          * Not_Found 0
@@ -32,13 +24,11 @@ using System.Linq;
     3: key dos revisores ( 32 bytes por revisor )
     4-n: dados
 
-    sempre o dado corrente. Segundo o status:
-    Confirmação : no dado estará o abstract
-    envio do artigo: no dado estará o artigo
-    aprovação: no dado estará os comentários de cada revisor
-    revisão: estará o artigo revisado
-    publicação: estará o adress do escritor, do editor e dos revisores
-
+    Endorse:
+             * 0: hash do lvl -> local onde está o lvl do usuário ( 32 bytes )
+             * 1: hash das skills e contadores ( 32 bytes ) -> contém todas as skills do usuário
+             * 2: hash do contador de lvl ( 32 bytes )
+             * os contadores são definidos pelo tamanho do array
     */
 
 namespace Neo.SmartContract
@@ -53,6 +43,11 @@ namespace Neo.SmartContract
         private static byte[] processPrefix = { 5 };
         private static byte[] publishPrefix = { 6 };
         private static byte[] reviewerCommentsPrefix = { 7 };
+
+        private static byte[] endorseCountPrefix = { 8 };
+        private static byte[] endorseSkillPrefix = { 9 };
+        private static byte[] endorseLvlCountPrefix = { 10 };
+        private static byte[] endorseLvlPrefix = { 11 };
 
         public static object Main( string operation, params object[] args )
         {
@@ -97,6 +92,18 @@ namespace Neo.SmartContract
             {
                 if( args.Length != 2 ) return false;
                 return RegisterReviewer( (byte[])args[0], (byte[])args[1] );
+            }
+
+            if( operation == "Endorse()")
+            {
+                if( args.Length != 3 ) return false;
+                return Endorse( (byte[])args[0], (byte[])args[1], (byte[])args[2] );
+            }
+
+            if( operation == "Endorse()" )
+            {
+                if( args.Length != 1 ) return false;
+                return GetEndorseData( (byte[])args[0] );
             }
 
             return false;
@@ -530,6 +537,28 @@ namespace Neo.SmartContract
 
             Storage.Put( Storage.CurrentContext, reviewersKey, reviewers );
             Runtime.Notify( "Reviewer registered" );
+
+            /* adicionando o revisor no ranking */
+            /* lvl hash */
+            byte[] lvlhash = endorseLvlPrefix;
+            lvlhash.Concat( ReviewerAddress );
+            lvlhash = Hash256( lvlhash );
+
+            /* hash skills count */
+            byte[] skillscounthash = endorseCountPrefix;
+            skillscounthash.Concat( ReviewerAddress );
+            skillscounthash = Hash256( skillscounthash );
+
+            /* hash skills count */
+            byte[] lvlcounthash = endorseLvlCountPrefix;
+            lvlcounthash.Concat( ReviewerAddress );
+            lvlcounthash = Hash256( lvlcounthash );
+
+            byte[] endorseData = lvlhash;
+            endorseData.Concat( skillscounthash) ;
+            endorseData.Concat( lvlcounthash );
+            Storage.Put( Storage.CurrentContext, address, endorseData );
+
             return true;
         }
 
@@ -539,6 +568,102 @@ namespace Neo.SmartContract
             if( !ok )
                 Runtime.Notify( "You are not the address" );
             return ok;
+        }
+
+        public static bool Endorse( byte[] address, byte[] toaddress, byte[] skill )
+        {
+            if( !VerifyWitness( address ) )
+                return false;
+
+            if ( address == toaddress )
+            {
+                Runtime.Notify( "You can't endorse yourself" );
+                return false;
+            }
+
+            byte[] smartContractScriptHash = ExecutionEngine.ExecutingScriptHash;
+
+            byte[] senderData = Storage.Get( Storage.CurrentContext, address );
+            byte[] receiverData = Storage.Get( Storage.CurrentContext, toaddress );
+
+            if( senderData.Length == 0 || receiverData.Length == 0 )
+            {
+                Runtime.Notify( "Not a reviewer" );
+                return false;
+            }
+
+            byte[] receiverSkills = Storage.Get( Storage.CurrentContext, Storage.Get( Storage.CurrentContext, receiverData.Range( 32, 32 ) ) );
+
+            bool ok = false;
+            for( int i = 0; i < receiverSkills.Length; i += 32 )
+            {
+                byte[] sk = receiverSkills.Range(i, 32);
+                if( sk == skill )
+                {
+                    byte[] count = Storage.Get( Storage.CurrentContext, sk );
+
+                    for( int j = 0; j < count.Length; j += 33 )
+                    {
+                        if( count.Range( i , 33 ) == address )
+                        {
+                            Runtime.Notify( "Already endorsed" );
+                            return false;
+                        }
+                    }
+                    count.Concat( address );
+                    Storage.Put( Storage.CurrentContext, sk, count );
+                    ok = true;
+                    break;
+                }
+            }
+
+            if( !ok )
+            {
+                byte[] sk = endorseSkillPrefix;
+                sk.Concat( toaddress );
+                sk.Concat( skill );
+                sk = Hash256( sk );
+                Storage.Put( Storage.CurrentContext, sk, address );
+                receiverSkills.Concat( sk );
+                Storage.Put( Storage.CurrentContext, Storage.Get( Storage.CurrentContext, receiverData.Range( 32, 32 ) ), receiverSkills);
+            }
+
+            byte[] receiverLvlCount = Storage.Get( Storage.CurrentContext, Storage.Get( Storage.CurrentContext, receiverData.Range( 64, 32 ) ) );
+            byte[] receiverlvl = Storage.Get( Storage.CurrentContext, Storage.Get( Storage.CurrentContext, receiverData.Range( 0, 32 ) ) );
+            byte[] senderlvl = Storage.Get(Storage.CurrentContext, Storage.Get( Storage.CurrentContext, senderData.Range( 0, 32 ) ) );
+
+            if( receiverlvl.Length <= senderlvl.Length )
+            {
+                receiverLvlCount.Concat( new byte[] { 0 } );// subiu um no contador de lvl
+            }
+
+            if( receiverLvlCount.Length == receiverlvl.Length )
+            {
+                receiverLvlCount = new byte[] { };
+                receiverlvl.Concat( new byte[] { 0 } );
+            }
+
+            Storage.Put( Storage.CurrentContext, Storage.Get( Storage.CurrentContext, receiverData.Range( 64, 32 ) ), receiverLvlCount );
+            Storage.Put( Storage.CurrentContext, Storage.Get( Storage.CurrentContext, receiverData.Range( 0, 32 ) ), receiverlvl );
+
+            byte[] data = Storage.Get( Storage.CurrentContext, smartContractScriptHash );
+            byte[] newData = address.Concat( toaddress );
+            data.Concat( newData );
+            Storage.Put( Storage.CurrentContext, smartContractScriptHash, data );
+
+            return true;
+        }
+
+        public static byte[] GetEndorseData( byte[] address )
+        {
+            byte[] data = Storage.Get( Storage.CurrentContext, address );
+
+            if( data.Length == 0 )
+            {
+                return null;
+            }
+
+            return data;
         }
     }
 }
