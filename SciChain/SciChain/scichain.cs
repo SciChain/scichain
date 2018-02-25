@@ -86,7 +86,7 @@ namespace Neo.SmartContract
                 return Endorse( (byte[])args[0], (byte[])args[1], (byte[])args[2] );
             }
 
-            if( operation == "Endorse()" )
+            if( operation == "GetEndorseData()")
             {
                 if( args.Length != 1 ) return false;
                 return GetEndorseData( (byte[])args[0] );
