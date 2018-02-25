@@ -168,6 +168,10 @@ b'3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a'
 
 Results ["ByteArray: bytearray(b'')"] 
 
+Parece que funciona:
+"47657450726f636573735374617475732829" [b'3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a']
+
+
 ======================================================================
 
 12) Recieve from process
