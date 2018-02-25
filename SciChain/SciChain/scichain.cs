@@ -228,21 +228,21 @@ namespace Neo.SmartContract
                     return false;
                 }
 
-                if ( data[0] != 1 || data[0] != 3 )
+                if ( data[0] == 1 || data[0] == 3 )
                 {
-                    Runtime.Notify( "A status data must be Rejected(1) or Waiting article(3)" );
-                    return false;
+                    processData = processData.Range(0, 65);
+                    Runtime.Notify("data:");
+                    Runtime.Notify(data);
+
+                    processData[0] = data[0];
+                    processData = processData.Concat(data.Range(1, data.Length - 1)); // colocando os dados dos revisores ( número de revisores ( 1 byte ) + conjunto de 32 bytes a key de cada editor
+                    Storage.Put(Storage.CurrentContext, processkey, processData);
+
+                    return true;
                 }
 
-                processData = processData.Range( 0, 65 );
-                Runtime.Notify("data:");
-                Runtime.Notify(data);
-
-                processData[0] = data[0];
-                processData = processData.Concat( data.Range( 1, data.Length - 1 ) ); // colocando os dados dos revisores ( número de revisores ( 1 byte ) + conjunto de 32 bytes a key de cada editor
-                Storage.Put( Storage.CurrentContext, processkey, processData );
-
-                return true;
+                Runtime.Notify("A status data must be Rejected(1) or Waiting article(3)");
+                return false;
             }
 
             if( status == 3 )
@@ -251,7 +251,7 @@ namespace Neo.SmartContract
                 authorKey.Concat( ownAddress );
                 authorKey = Hash256( authorKey );
 
-                if( processData.Range( 1, 32 ) == authorKey )
+                if( processData.Range( 1, 32 ) != authorKey )
                 {
                     Runtime.Notify( "Not the article author" );
                     return false;
@@ -308,7 +308,7 @@ namespace Neo.SmartContract
                 byte[] editorKey = ownAddress.Concat("editorAddress".AsByteArray());
                 editorKey = Hash256(editorKey);
 
-                if ( processData.Range( 33, 32 ) == editorKey )
+                if ( processData.Range( 33, 32 ) != editorKey )
                 {
                     Runtime.Notify( "Not the article editor" );
                     return false;
@@ -340,7 +340,7 @@ namespace Neo.SmartContract
                 authorKey = authorKey.Concat( ownAddress );
                 authorKey = Hash256( authorKey );
 
-                if( processData.Range( 1, 32 ) == authorKey )
+                if( processData.Range( 1, 32 ) != authorKey )
                 {
                     Runtime.Notify( "Not the article author" );
                     return false;
@@ -354,34 +354,34 @@ namespace Neo.SmartContract
 
             if ( status == 7 )
             {
-                if( data[0] != 1 || data[0] != 2 )
+                if( data[0] == 1 || data[0] == 2 )
                 {
-                    Runtime.Notify( "Data must be Rejected(1) or Aprroved(2)" );
-                    return false;
-                }
+                    byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
+                    reviewerKey = reviewerKey.Concat(ownAddress);
+                    reviewerKey = Hash256(reviewerKey);
 
-                byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
-                reviewerKey = reviewerKey.Concat( ownAddress );
-                reviewerKey = Hash256( reviewerKey );
-
-                int numA = 0;
-                for( int i = 66, count = 0; i < (66 + 32 * processData[65]); i += 32, count++ )
-                {
-                    int idx = ( 66 + 32 * processData[65] ) + count;
-                    if( processData[idx] != 0 )
-                        numA++;
-                    if ( processData.Range( i, 32 ) == reviewerKey )
+                    int numA = 0;
+                    for (int i = 66, count = 0; i < (66 + 32 * processData[65]); i += 32, count++)
                     {
-                        processData[idx] = data[0];
+                        int idx = (66 + 32 * processData[65]) + count;
+                        if (processData[idx] != 0)
+                            numA++;
+                        if (processData.Range(i, 32) == reviewerKey)
+                        {
+                            processData[idx] = data[0];
+                        }
                     }
+
+                    if (numA == processData[65])// todos avaliaram
+                    {
+                        processData[0] = 8;
+                        Storage.Put(Storage.CurrentContext, processkey, processData);
+                    }
+                    return true;
                 }
 
-                if( numA == processData[65] )// todos avaliaram
-                {
-                    processData[0] = 8;
-                    Storage.Put( Storage.CurrentContext, processkey, processData );
-                }
-                return true;
+                Runtime.Notify("Data must be Rejected(1) or Aprroved(2)");
+                return false;
             }
 
             Runtime.Notify( "Not the article reviewer" );
