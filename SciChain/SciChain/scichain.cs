@@ -152,10 +152,10 @@ namespace Neo.SmartContract
             Runtime.Notify(authorKey);
 
             byte[] processData = new byte[] { 2 }; //status
-            processes = processData.Concat( authorKey );
-            processes = processData.Concat( editorKey );
-            processes = processData.Concat( new byte[] { 0 } ); // número de revisores
-            processes = processData.Concat( data ); // abstract
+            processData = processData.Concat( authorKey );
+            processData = processData.Concat( editorKey );
+            processData = processData.Concat( new byte[] { 0 } ); // number of reviewers
+            processData = processData.Concat( data ); // abstract
 
             Runtime.Notify("processKey => processData: ");
             Runtime.Notify(processData);
