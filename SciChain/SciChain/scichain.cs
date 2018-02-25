@@ -110,6 +110,9 @@ namespace Neo.SmartContract
             byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
             editorKey = Hash256(editorKey);
 
+            Runtime.Notify("using editorKey:");
+            Runtime.Notify(editorKey);
+
             if ( Storage.Get( Storage.CurrentContext, editorKey ) != authorAddress )
             {
                 Runtime.Notify( "Editor not found" );
@@ -119,25 +122,43 @@ namespace Neo.SmartContract
             byte[] epKey = editorAddress.Concat("editorProcess".AsByteArray());
             epKey = Hash256(epKey);
 
+            Runtime.Notify("using epKey:");
+            Runtime.Notify(epKey);
+
             byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
+
+            Runtime.Notify("processes:");
+            Runtime.Notify(processes);
 
             byte[] processKey = Hash256(processes).Concat("Process".AsByteArray());
             processKey.Concat(editorAddress);
             processKey.Concat(authorAddress);
             processKey = Hash256(processKey);
 
+            Runtime.Notify("middle processKey:");
+            Runtime.Notify(processKey);
+
             processes.Concat( processKey );
             Storage.Put( Storage.CurrentContext, epKey, processes );
+
+            Runtime.Notify("epKey => processes: ");
+            Runtime.Notify(processes);
 
             byte[] authorKey = processKey.Concat("Author".AsByteArray());
             authorKey.Concat( editorAddress );
             authorKey = Hash256( authorKey );
+
+            Runtime.Notify("authorKey:");
+            Runtime.Notify(authorKey);
 
             byte[] processData = new byte[] { 2 }; //status
             processData.Concat( authorKey );
             processData.Concat( editorKey );
             processData.Concat( new byte[] { 0 } ); // número de revisores
             processData.Concat( data ); // abstract
+
+            Runtime.Notify("processKey => processData: ");
+            Runtime.Notify(processData);
 
             Storage.Put( Storage.CurrentContext, processKey, processData );
 
