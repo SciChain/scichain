@@ -133,15 +133,26 @@ Results ["ByteArray: bytearray(b'\\x00')"]
 
 10) Request Article 
 
-"5265717565737441727469636c652829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","Hello World Paper","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+"5265717565737441727469636c652829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","HelloWorldPaper","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 
--------------------------------------------------------------------------------------------------------------------------------------
-Test invoke successful
-Total operations: 53 
-Results ['ByteArray: b\'Paper","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]\'', "ByteArray: b'World'", "ByteArray: bytearray(b'\\x00')"] 
-Invoke TX gas cost: 0.0 
-Invoke TX Fee: 0.001 
--------------------------------------------------------------------------------------------------------------------------------------
+
+
+b'using editorKey:']
+b')\xca\x01V\xb7\xd9\xc9\xe4Y(!c\x18r\xe2\xd4\x97\xa9+\x89\xeeP\x8f\x07g\xfc\xec6\x86\xab\xc7\xc7']
+b'using epKey:']
+b'7y.e\xf8\xff\xbd\x91d\xebp\x0f+\xe8\xd5b\xe6\x8d\xf5C\xbf\xbe=\xb2\xc7\x18\x17\x18T\tX7']
+b'processes:']
+b'']
+b'middle processKey:']
+b'\xbd&\\?\x11\xad\x9c\xc8\xb5\xda\xd3T\xff\x01\xfa\x92\x15/X\xc8K+y\x9f\xed\xf3\xd4\xe5\xb0\xf6\xf7A']
+b'epKey => processes: ']
+b'']
+b'authorKey:']
+b'\x807\xae\xcc\xd2\'\xca\xe8=\xba\xce"b\xd5\xfc\xa8\x90\xb4\x0bq\x0f\xad2yODS\xc30X\x8b\xb8']
+b'processKey => processData: ']
+b'\x02']
+
+Results ["ByteArray: b'\\xbd&\\\\?\\x11\\xad\\x9c\\xc8\\xb5\\xda\\xd3T\\xff\\x01\\xfa\\x92\\x15/X\\xc8K+y\\x9f\\xed\\xf3\\xd4\\xe5\\xb0\\xf6\\xf7A'"] 
 
 
 ======================================================================
