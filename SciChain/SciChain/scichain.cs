@@ -447,6 +447,11 @@ namespace Neo.SmartContract
             return false;
         }
 
+
+        // function string "RegisterEditor()" => "5265676973746572456469746f722829"
+        // invoke example in Main: "5265676973746572456469746f722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+        // input: expected byte[] with 20 bytes (representing WIF example: b'23ba2703c53263e8d6e522dc32203339dcd8eee9')
+        // output: return is expected to be 32 bytes hash: b'29ca0156b7d9c9e4592821631872e2d497a92b89ee508f0767fcec3686abc7c7'
         public static byte[] RegisterEditor( byte[] address )
         {
             byte[] editorAddress = address;
