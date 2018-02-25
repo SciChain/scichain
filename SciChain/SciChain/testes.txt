@@ -131,5 +131,22 @@ Results ["ByteArray: bytearray(b'\\x00')"]
 
 ======================================================================
 
+10) Request Article 
+
+"5265717565737441727469636c652829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","Hello World Paper","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+
+-------------------------------------------------------------------------------------------------------------------------------------
+Test invoke successful
+Total operations: 53 
+Results ['ByteArray: b\'Paper","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]\'', "ByteArray: b'World'", "ByteArray: bytearray(b'\\x00')"] 
+Invoke TX gas cost: 0.0 
+Invoke TX Fee: 0.001 
+-------------------------------------------------------------------------------------------------------------------------------------
+
+
+======================================================================
+
+
+
 
 
