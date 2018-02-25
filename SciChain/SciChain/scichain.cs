@@ -473,6 +473,10 @@ namespace Neo.SmartContract
             return editorKey;
         }
 
+        // function string "RegisterReviewer()" => "526567697374657252657669657765722829"
+        // invoke example in Main: "526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","APLJBPhtRg2XLhtpxEHd6aRNL7YSLGH2ZL"]
+        // input: expected two byte[] with 20 bytes (representing WIF example: b'23ba2703c53263e8d6e522dc32203339dcd8eee9' and b'52eaab8b2aab608902c651912db34de36e7a2b0f')
+        // output: return is expected to be true (if not registered yet)
         public static bool RegisterReviewer( byte[] address, byte[] ReviewerAddress )
         {
             byte[] editorAddress = address;
