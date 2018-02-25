@@ -314,24 +314,24 @@ namespace Neo.SmartContract
                     return false;
                 }
 
-                if ( data[0] != 1 || data[0] != 6 )
+                if ( data[0] == 1 || data[0] == 6 )
                 {
-                    Runtime.Notify( "A status data must be Rejected(1) or Waiting publishing(6)" );
-                    return false;
+                    processData[0] = data[0];
+                    processData = processData.Range(0, (66 + 32 * processData[65])); // limpando dados anteriores
+
+                    int len = processData[65];
+                    byte[] numApproval = new byte[] { };
+                    for (int i = 0; i < len; ++i)
+                        numApproval.Concat(new byte[] { 0 });
+
+                    processData = processData.Concat(numApproval); // adicionando campos para os revisores avaliarem se o artigo que o author colocará sem criptografia foi o mesmo que eles avaliaram.
+                                                                   // 1 não aprovado e 2 aprovado
+                    Storage.Put(Storage.CurrentContext, processkey, processData);
+                    return true;
                 }
 
-                processData[0] = data[0];
-                processData = processData.Range( 0, ( 66 + 32 * processData[65] ) ); // limpando dados anteriores
-
-                int len = processData[65];
-                byte[] numApproval = new byte[] { };
-                for( int i = 0; i < len; ++i )
-                    numApproval.Concat( new byte[] { 0 } );
-
-                processData = processData.Concat( numApproval ); // adicionando campos para os revisores avaliarem se o artigo que o author colocará sem criptografia foi o mesmo que eles avaliaram.
-                                                   // 1 não aprovado e 2 aprovado
-                Storage.Put( Storage.CurrentContext, processkey, processData );
-                return true;
+                Runtime.Notify("A status data must be Rejected(1) or Waiting publishing(6)");
+                return false;
             }
 
             if( status == 6 )
