@@ -147,6 +147,8 @@ namespace Neo.SmartContract
             //calculating key with 256bits that has unique value for the author
             byte[] authorKey = processKey.Concat("Author".AsByteArray());
             authorKey = authorKey.Concat( authorAddress );
+            Runtime.Notify("authorKey before Hash" );
+            Runtime.Notify(authorKey);
             authorKey = Hash256( authorKey );
 
             Runtime.Notify("authorKey:");
@@ -287,7 +289,10 @@ namespace Neo.SmartContract
                 Runtime.Notify(status);
                 //calculating key with 256bits that has unique value for the author
                 byte[] authorKey = processkey.Concat("Author".AsByteArray());
-                authorKey.Concat( ownAddress );
+                authorKey=authorKey.Concat( ownAddress );
+                Runtime.Notify("authorKey before Hash" );
+                Runtime.Notify(authorKey);
+
                 authorKey = Hash256( authorKey );
 
                 Runtime.Notify("authorKey" );
