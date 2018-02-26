@@ -116,7 +116,15 @@
 							<div class="content">
 								<div class="inner">
 									<h2>Creating a new journal (editor)</h2>
-									<p>Tutorial...</p>
+									<p>In order to create a new journal, the editor in charge can pass its address (20 bytes) to
+                           RegisterEditor function.</p>
+                  <p>neo> testinvoke fc47d1b7b2fe38096433af7c5e543033d87a86d1</p>
+                  <p>"5265676973746572456469746f722829" ["AUk19KeZqgryWfxfvfAkCcEFLNGhzoPivi"]</p>
+                  <p>Used 1.472 Gas</p>
+                  <p>This function returns an EditorKey (32 bytes). This EditorKey plays an important role in
+the next operations.</p>
+                  <p>If an Editor tries to register multiple times, system will return the appropriate message:
+"Editor is already registered".</p>
 									<!-- <ul class="actions">
 										<li><a href="#" class="button">Learn more</a></li>
 									</ul> -->
@@ -128,7 +136,18 @@
 							<div class="content">
 								<div class="inner">
 									<h2>Including a new reviewer (referee)</h2>
-									<p> Tutorial... </p>
+									<p> Each editor can register a set of reviewers using RegisterReviewer function, passing both
+its address (20 bytes) and the reviewer address (20 bytes).</p>
+                  <p>neo> testinvoke 0xfc47d1b7b2fe38096433af7c5e543033d87a86d1
+"526567697374657252657669657765722829" ["AUk19KeZqgryWfxfvfAkCcEFLNGhzoPivi","APLJBPhtRg2XLhtpxEHd6aRNL7YSLGH2ZL"] </p>
+                  <p>Used 1.818 Gas</p>
+                  <p>This function returns true (1) if reviewer is succefully registered. If the reviewer is
+included many times, system will return the appropriate message: "Reviewer already
+registered".</p>
+                  <p>This function has already many internals that deal with Endorsement invocations
+(interacting with several other functions), and in future works (see roadmap below) we
+will allow for self-managed journals to filter reviewers automatically (integrated with a
+Dynamic Invoke smart contract called Smart Rules, in the same github project).</p>
 								</div>
 							</div>
 						</section>
@@ -137,7 +156,52 @@
 							<div class="content">
 								<div class="inner">
 									<h2>Uploading an article</h2>
-									<p>Tutorial ... </p>
+									<p>When an author intends to submit a paper to an specific journal (scientific community) , it
+can call RequestArticle function. The first parameter addresses the self address, then thedata content (title + abstract + keywords), then the editor address. Note that the editor
+itself is allowed to participate.</p>
+                  <p> testinvoke "5265717565737441727469636c652829"
+["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","HelloWorldPaper","AK2nJJpJr6o664CW
+JKi1QRXjqeic2zRp8y"] </p>
+                  <p> This function returns an special ProcessKey (32 bytes) that can track the author
+communication with the editor/journal, and store process-related information. Initially,
+the payload is used for title, abstract and keywords submission, and this information is
+used by the editor to decide upon reviewer assignment. This part is intended to connect
+with Endorsement functions in order to allow for autonomous reviewer selection in
+SciChain self-managed journals.</p>
+								</div>
+							</div>
+						</section>
+            <section>
+							<a href="#" class="image"><img src="images/g911.png" alt="" data-position="25% 25%" /></a>
+							<div class="content">
+								<div class="inner">
+									<h2>Future works and Roadmap</h2>
+									<p>There are many future works for SciChain, and we will continue to develop them, as the
+idea emerged in casual talks in early February 2017. We believe this project can be the
+start of a revolution in the way we do science, and perhaps this can bring birth to many
+other similar projects that will fulfill the purpose of bringing a more transparent science.</p>
+                  <p>Our development roadmap includes:</p>
+                  <p>Q2 2018</p>
+                  <p> - Integrating basic smart contract operations with scichain.org website</p>
+                  <p> - Improving hability endorsement calculations in smart contract </p>
+                  <p> - Integrating SmartRules smart contract with Dynamic Invoke, to allow
+remote/personalized judgements </p>
+                  <p> Q3 2018 </p>
+                  <p> - Integrating cryptographic end-to-end compilations in website </p>
+                  <p> - Integrating advanced smart contract operations with scichain.org website </p>
+								</div>
+							</div>
+						</section>
+
+            <section>
+							<a href="#" class="image"><img src="images/g911.png" alt="" data-position="25% 25%" /></a>
+							<div class="content">
+								<div class="inner">
+									<h2>Getting more information</h2>
+									<p>More information for the many other operations available can be found in SciChain documentation at <a href="https://github.com/igormcoelho/scichain">GitHub</a>.</p>
+                  <p>We are proudly MIT licensed and expect collaborations, ideas or donations to keep the project going :) </p>
+                  <p> AdfJSyxgpTZTGSWCnApWPA49hQG7ANVdht </p>
+                  <p> Copyleft 2017-2018. SciChain team </p>
 								</div>
 							</div>
 						</section>
