@@ -25,5 +25,7 @@ the capacity of the researchers (mainly in underdeveloped countries) to be updat
 
 ==============
 
+Donation accepted at: _AdfJSyxgpTZTGSWCnApWPA49hQG7ANVdht_
+
 Copyleft 2017-2018
 SciChain team
