@@ -15,8 +15,8 @@ a qualified journal, the study is considered valid and is referenced in future s
 
 In order to achieve a truly transparent process in peer-review, we propose <b>SciChain</b>. As <b>SciChain</b> is
 build on top of _NEO Blockchain_ (a blockchain can be seen as a public database where the defined rules are always
-respected), there will be no way of "cheating" in peer-review, for example, indicating known friends are reviewers,
-breaking the _double-blind_ principle (what means that both and the author and reviewer must not know who is each other),
+respected), there will be no way of "cheating" in peer-review, for example, indicating known friends as reviewers,
+breaking the _double-blind_ principle (what means that both the author and reviewer must not know who is each other),
 and many other bad actions that hurt our precious Science :'(
 
 One the many flaws in scientific studies is also related to low reproducibility of scientific studies, since few journals are available and they
