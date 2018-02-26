@@ -146,7 +146,7 @@ namespace Neo.SmartContract
 
             //calculating key with 256bits that has unique value for the author
             byte[] authorKey = processKey.Concat("Author".AsByteArray());
-            authorKey = authorKey.Concat( editorAddress );
+            authorKey = authorKey.Concat( authorAddress );
             authorKey = Hash256( authorKey );
 
             Runtime.Notify("authorKey:");
@@ -256,12 +256,10 @@ namespace Neo.SmartContract
                     processData = processData.Range(1, 65); // removing the abstract and the first index, because it will be updated
                     Runtime.Notify("processData with abstract cut" );
                     Runtime.Notify(processData);
-
-                    //TODO - create an if that also updates to 1
-                    byte newStatus = data[0];
+                   
+                    byte newStatus = data[0];  //TODO - use newStatus and create an if that also updates to 1
                     byte[] newProcessData = new byte[] { 3 };
                     newProcessData = newProcessData.Concat( processData );
-
 
                     Runtime.Notify("processData with abstract cut and modified status" );
                     Runtime.Notify(newProcessData);
@@ -289,16 +287,30 @@ namespace Neo.SmartContract
                 authorKey.Concat( ownAddress );
                 authorKey = Hash256( authorKey );
 
+                Runtime.Notify("authorKey" );
+                Runtime.Notify(authorKey);
+
+                Runtime.Notify("processData.Range( 1, 32 )" );
+                Runtime.Notify(processData.Range( 1, 32 ));
+
                 if( processData.Range( 1, 32 ) != authorKey) //getting the data from the header and checking if the caller is the author
                 {
                     Runtime.Notify( "Not the article author" );
                     return false;
                 }
 
-                processData[0] = 4;
-                processData = processData.Concat( new byte[] { 0 } ); // 1byte for number of grades
-                processData = processData.Concat( data ); //sending the article encrypted by a simmetric key and the simetric key used encrypted with the public keys
-                Storage.Put( Storage.CurrentContext, processkey, processData );
+                byte[] newProcessData = new byte[] { 4 };
+                newProcessData = newProcessData.Concat( new byte[] { 0 } );// 1byte for number of grades
+		newProcessData = newProcessData.Concat( data ); //sending the article encrypted by a simmetric key and the simetric key used encrypted with the public keys
+
+                Runtime.Notify("newProcessData with Article:" );
+                Runtime.Notify(newProcessData);
+
+                //processData[0] = 4;
+                //processData = processData.Concat( new byte[] { 0 } ); 
+                //processData = processData.Concat( data ); //sending the article encrypted by a simmetric key and the simetric key used encrypted with the public keys
+
+                Storage.Put( Storage.CurrentContext, processkey, newProcessData );
                 return true;
             }
 
