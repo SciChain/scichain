@@ -24,21 +24,26 @@ import contract HASH.avm "0710" "05" true false
 
 1)Register editor)
 
-testinvoke d2f62ea018b7cf541b340d9e4eb70f39811209a6 "5265676973746572456469746f722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+testinvoke f63aaacc94ed0bcd01d60ccb4a8090132530fbb0 "5265676973746572456469746f722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 
 10) Request Article 
 
-testinvoke d2f62ea018b7cf541b340d9e4eb70f39811209a6 "5265717565737441727469636c652829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","HelloWorldPaper","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+testinvoke f63aaacc94ed0bcd01d60ccb4a8090132530fbb0 "5265717565737441727469636c652829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","HelloWorldPaper","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 
 12) Send Data to Process and, possible, modify it (several tests)
 
-From 2 to 3
+From 2 to 3 -- Editor should say next status (1 or 3) and give number of reviewers and their wallet
 
-testinvoke d2f62ea018b7cf541b340d9e4eb70f39811209a6 "53656e6444617461546f50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b"3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a",b"030252eaab8b2aab608902c651912db34de36e7a2b0fb1761b44255107162d3c79680b81b4c8a5efc597"]
+testinvoke f63aaacc94ed0bcd01d60ccb4a8090132530fbb0 "53656e6444617461546f50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b"3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a",b"030252eaab8b2aab608902c651912db34de36e7a2b0fb1761b44255107162d3c79680b81b4c8a5efc597"]
 
-From 3 to 4
+From 3 to 4 -- Author should update the paper with simetric keys
 
-testinvoke d2f62ea018b7cf541b340d9e4eb70f39811209a6 "53656e6444617461546f50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b"3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a",b"02020501505050050510505"]
+testinvoke f63aaacc94ed0bcd01d60ccb4a8090132530fbb0 "53656e6444617461546f50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b"3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a","00ThisIsAFullCompleteAndIncrediblePaper"]
+
+From 4 to 5 -- Reviewers should do their job
+
+testinvoke f63aaacc94ed0bcd01d60ccb4a8090132530fbb0 "53656e6444617461546f50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b"3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a",b"02020501505050050510505"]
+
 
 
 --------------------------------------------

@@ -341,7 +341,6 @@ namespace Neo.SmartContract
                     Runtime.Notify("i:" );
                     Runtime.Notify(i);
 
-
                     if( processData.Range( i, 32 ) == reviewerKey)//getting the data from the header and checking if the caller is one of the reviewers
                     {
                         //calculating key with 256bits that has unique value for the reviewer to get and write the reviewer comments
@@ -352,12 +351,11 @@ namespace Neo.SmartContract
                   	Runtime.Notify("reviewerCommentsKey:" );
                     	Runtime.Notify(reviewerCommentsKey);
 
-
                         byte[] reviewerComments = Storage.Get( Storage.CurrentContext, reviewerCommentsKey );
 
                         if( reviewerCommentsKey.Length > 0 )//checkig if the reviewer already send the grade
                         {
-                            Runtime.Notify( "Already rated" );
+                            Runtime.Notify( "Your review was already registered." );
                             return false;
                         }
 
@@ -370,10 +368,9 @@ namespace Neo.SmartContract
                         Runtime.Notify("processData:" );
                     	Runtime.Notify(processData);
 
-
                         processData = processData.Concat( reviewerCommentsKey );
 
-                        Runtime.Notify("processData with reviewer comments key:" );
+                        Runtime.Notify("processData now contains the key that contains the comments of this current reviewers." );
                     	Runtime.Notify(processData);
 
                         Storage.Put( Storage.CurrentContext, processkey, processData );
@@ -381,7 +378,7 @@ namespace Neo.SmartContract
                     }
                 }
 
-                Runtime.Notify( "Not the article reviewer" );
+                Runtime.Notify( "Caller is not a reviewer of this process key" );
                 return false;
             }
 
