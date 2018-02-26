@@ -289,7 +289,7 @@ namespace Neo.SmartContract
                 Runtime.Notify(status);
                 //calculating key with 256bits that has unique value for the author
                 byte[] authorKey = processkey.Concat("Author".AsByteArray());
-                authorKey=authorKey.Concat( ownAddress );
+                authorKey = authorKey.Concat( ownAddress );
                 Runtime.Notify("authorKey before Hash" );
                 Runtime.Notify(authorKey);
 
@@ -371,7 +371,7 @@ namespace Neo.SmartContract
                     	Runtime.Notify(processData);
 
 
-                        processData.Concat( reviewerCommentsKey );
+                        processData = processData.Concat( reviewerCommentsKey );
 
                         Runtime.Notify("processData with reviewer comments key:" );
                     	Runtime.Notify(processData);
@@ -406,7 +406,7 @@ namespace Neo.SmartContract
                     int len = processData[65];
                     byte[] numApproval = new byte[] { };
                     for (int i = 0; i < len; ++i)
-                        numApproval.Concat(new byte[] { 0 });
+                        numApproval = numApproval.Concat(new byte[] { 0 });
 
                     processData = processData.Concat(numApproval); // Adding a space for the reviwers approve the decrypted article that will be sent ( avoiding change the data before the publishment )
                                                                    // set 1 for approved and 2 for rejected
@@ -656,7 +656,7 @@ namespace Neo.SmartContract
                 }
             }
 
-            reviewers=reviewers.Concat( ReviewerAddress );
+            reviewers = reviewers.Concat( ReviewerAddress );
 
             Storage.Put( Storage.CurrentContext, reviewersKey, reviewers );
  
@@ -757,7 +757,7 @@ namespace Neo.SmartContract
                             return false;
                         }
                     }
-                    count.Concat( address );
+                    count = count.Concat( address );
                     Storage.Put( Storage.CurrentContext, sk, count );
                     ok = true;
                     break;
