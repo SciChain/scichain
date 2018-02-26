@@ -174,6 +174,9 @@ namespace Neo.SmartContract
 
         public static bool SendDataToProcess( byte[] address, byte[] processkey, byte[] data )
         {
+            Runtime.Notify("Data:");
+            Runtime.Notify(data);
+
             if ( data.Length == 0 )
             {
                 Runtime.Notify( "Empty data" );
