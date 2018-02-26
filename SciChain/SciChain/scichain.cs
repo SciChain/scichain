@@ -4,33 +4,6 @@ using Neo.SmartContract.Framework.Services.System;
 using System;
 using System.Linq;
 
-/*
-    Lista de dados:
-    0: status ( 1 byte ) :
-         * Not_Found 0
-         * Process_Rejected  1
-         * Waiting_Editor_Acceptance  2
-         * Waiting_article  3
-         * Waiting_rating 4
-         * Waiting_approval,  5
-         * Waiting_decrypto_article 6
-         * waiting_reviewers_approval 7
-         * Waiting_for_publication  8
-         * Published 9
-
-    1: key do author/authores ( 32 bytes )
-    2: key do editor ( 32 bytes )
-    3: número de revisores ( 1 byte )
-    3: key dos revisores ( 32 bytes por revisor )
-    4-n: dados
-
-    Endorse:
-             * 0: hash do lvl -> local onde está o lvl do usuário ( 32 bytes )
-             * 1: hash das skills e contadores ( 32 bytes ) -> contém todas as skills do usuário
-             * 2: hash do contador de lvl ( 32 bytes )
-             * os contadores são definidos pelo tamanho do array
-    */
-
 namespace Neo.SmartContract
 {
     public class SciChain : Framework.SmartContract
@@ -38,10 +11,11 @@ namespace Neo.SmartContract
         public static object Main( string operation, params object[] args )
         {
 
+            //verifying the operation arg
             if( operation == "GetProcessStatus()" )
             {
                 if( args.Length != 1 ) return false;
-                return GetProcessStatus( (byte[])args[0] );
+                return GetProcessStatus( (byte[])args[0] ); 
             }
 
             if( operation == "RequestArticle()" )
@@ -95,6 +69,19 @@ namespace Neo.SmartContract
             return false;
         }
 
+        /*
+         Get the process status:
+             Not found -> 0
+             Process rejected -> 1
+             Waiting editor acceptance ->  2
+             Waiting encrypted article ->  3
+             Waiting Reviewers send grades and comments -> 4
+             Waiting Editor approval -> 5
+             Waiting decrypted article -> 6
+             waiting reviewers approval -> 7
+             Waiting for publication ->  8
+             Published -> 9
+         */
         public static byte GetProcessStatus( byte[] processkey )
         {
             byte[] processData = Storage.Get( Storage.CurrentContext, processkey );
@@ -112,31 +99,37 @@ namespace Neo.SmartContract
         {
             byte[] authorAddress = address;
 
-            if( !VerifyWitness( authorAddress ) )
+            if( !VerifyWitness( authorAddress ) ) //checking if the address is the same of caller's address
                 return null;
 
+            //calculating key with 256bits that has unique value for the editor
             byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
             editorKey = Hash256(editorKey);
 
             Runtime.Notify("using editorKey:");
             Runtime.Notify(editorKey);
 
+            //checking if the editor is registered
             if ( Storage.Get( Storage.CurrentContext, editorKey ) != editorAddress )
             {
                 Runtime.Notify( "Editor not found" );
                 return null;
             }
 
+            //calculating key with 256bits that has unique value for all editor processes
             byte[] epKey = editorAddress.Concat("editorProcess".AsByteArray());
             epKey = Hash256(epKey);
 
             Runtime.Notify("using epKey:");
             Runtime.Notify(epKey);
 
+            //getting all processes keys ( 32 bytes ) that editor has
             byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
             Runtime.Notify("processes:");
             Runtime.Notify(processes);
 
+            /*calculating key with 256bits that has unique value for the process
+               using all previous processes keys as nonce*/
             byte[] processKey = Hash256(processes).Concat("Process".AsByteArray());
             processKey = processKey.Concat(editorAddress);
             processKey = processKey.Concat(authorAddress);
@@ -151,6 +144,7 @@ namespace Neo.SmartContract
             Runtime.Notify("epKey => processes: ");
             Runtime.Notify(processes);
 
+            //calculating key with 256bits that has unique value for the author
             byte[] authorKey = processKey.Concat("Author".AsByteArray());
             authorKey = authorKey.Concat( editorAddress );
             authorKey = Hash256( authorKey );
@@ -158,20 +152,35 @@ namespace Neo.SmartContract
             Runtime.Notify("authorKey:");
             Runtime.Notify(authorKey);
 
-            byte[] processData = new byte[] { 2 }; //status
+            /*creating the process data:
+                status ( 1 byte ) :
+                author key ( 32 bytes )
+                editor key ( 32 bytes )
+                number of reviewers ( 1 byte )
+                reviewers keys ( 32 bytes por revisor )
+                data
+            */
+            byte[] processData = new byte[] { 2 }; // first status -> Waiting editor acceptance
             processData = processData.Concat( authorKey );
             processData = processData.Concat( editorKey );
-            processData = processData.Concat( new byte[] { 0 } ); // number of reviewers
-            processData = processData.Concat( data ); // abstract
+            processData = processData.Concat( new byte[] { 0 } ); // number of reviewers starting with 0 because the editor must choose them
+            processData = processData.Concat( data ); // the abstract
 
             Runtime.Notify("processKey => processData: ");
             Runtime.Notify(processData);
 
-            Storage.Put( Storage.CurrentContext, processKey, processData );
+            Storage.Put( Storage.CurrentContext, processKey, processData ); //writing the data
 
             return processKey;
         }
 
+        /*
+         This function is used to send data along the process. What you should send changes when the status changes.
+         For example:
+            if the status is 2, only the editor can send data to the process and this data must be the new status, all the revisors and the public keys
+            if the status is 3, only the author can send the article encrypted by a simmetric key and the simetric key used encrypted with the public keys
+            if the status is 4, only the reviewers can send the grade and the comments
+        */
         public static bool SendDataToProcess( byte[] address, byte[] processkey, byte[] data )
         {
             Runtime.Notify("Data:");
@@ -222,10 +231,11 @@ namespace Neo.SmartContract
 
             if ( status == 2 )
             {
+                //calculating key with 256bits that has unique value for the editor
                 byte[] editorKey = ownAddress.Concat("editorAddress".AsByteArray());
                 editorKey = Hash256(editorKey);
 
-                if ( processData.Range( 33, 32 ) != editorKey )
+                if ( processData.Range( 33, 32 ) != editorKey ) //getting the data from the header and checking if the caller is the editor
                 {
                     Runtime.Notify( "Not the article editor" );
                     return false;
@@ -233,12 +243,12 @@ namespace Neo.SmartContract
 
                 if ( data[0] == 1 || data[0] == 3 )
                 {
-                    processData = processData.Range(0, 65);
+                    processData = processData.Range(0, 65); // removing the abstract
                     Runtime.Notify("data:");
                     Runtime.Notify(data);
 
                     processData[0] = data[0];
-                    processData = processData.Concat(data.Range(1, data.Length - 1)); // colocando os dados dos revisores ( número de revisores ( 1 byte ) + conjunto de 32 bytes a key de cada editor
+                    processData = processData.Concat(data.Range(1, data.Length - 1)); // adding the number of reviwers( 1 byte ) + all the reviewers keys( 32 bytes each ) + all reviewers public keys ( generated outside the blockchain )
                     Storage.Put(Storage.CurrentContext, processkey, processData);
 
                     return true;
@@ -250,25 +260,27 @@ namespace Neo.SmartContract
 
             if( status == 3 )
             {
+                //calculating key with 256bits that has unique value for the author
                 byte[] authorKey = processkey.Concat("Author".AsByteArray());
                 authorKey.Concat( ownAddress );
                 authorKey = Hash256( authorKey );
 
-                if( processData.Range( 1, 32 ) != authorKey )
+                if( processData.Range( 1, 32 ) != authorKey) //getting the data from the header and checking if the caller is the author
                 {
                     Runtime.Notify( "Not the article author" );
                     return false;
                 }
 
                 processData[0] = 4;
-                processData = processData.Concat( new byte[] { 0 } ); // um byte contador de avaliações
-                processData = processData.Concat( data ); // enviando a chave simétrica criptografada com a chave publica de cada revisor + artigo criptografado com a chave simétrica
+                processData = processData.Concat( new byte[] { 0 } ); // 1byte for number of grades
+                processData = processData.Concat( data ); //sending the article encrypted by a simmetric key and the simetric key used encrypted with the public keys
                 Storage.Put( Storage.CurrentContext, processkey, processData );
                 return true;
             }
 
             if( status == 4 )
             {
+                //calculating key with 256bits that has unique value for the reviewer
                 byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
                 reviewerKey = reviewerKey.Concat( ownAddress );
                 reviewerKey = Hash256( reviewerKey );
@@ -276,15 +288,16 @@ namespace Neo.SmartContract
                 int idx = ( 66 + 32 * processData[65] );
                 for ( int i = 66; i < ( 66 + 32*processData[65] ); i += 32 )
                 {
-                    if( processData.Range( i, 32 ) == reviewerKey )
+                    if( processData.Range( i, 32 ) == reviewerKey)//getting the data from the header and checking if the caller is one of the reviewers
                     {
+                        //calculating key with 256bits that has unique value for the reviewer to get and write the reviewer comments
                         byte[] reviewerCommentsKey = processkey.Concat("ReviewerComments".AsByteArray());
                         reviewerCommentsKey = reviewerCommentsKey.Concat( reviewerKey );
                         reviewerCommentsKey = Hash256( reviewerCommentsKey );
 
                         byte[] reviewerComments = Storage.Get( Storage.CurrentContext, reviewerCommentsKey );
 
-                        if( reviewerCommentsKey.Length > 0 )
+                        if( reviewerCommentsKey.Length > 0 )//checkig if the reviewer already send the grade
                         {
                             Runtime.Notify( "Already rated" );
                             return false;
@@ -292,9 +305,9 @@ namespace Neo.SmartContract
 
                         Storage.Put( Storage.CurrentContext, reviewerCommentsKey, data );
 
-                        processData[idx] = (byte)(processData[idx] + 1);
+                        processData[idx] = (byte)(processData[idx] + 1);// accumulating number of grades 
                         if (processData[idx] == processData[65])
-                            processData[0] = 5;
+                            processData[0] = 5;// changing the status when all reviewer send the grades
 
                         processData.Concat( reviewerCommentsKey );
                         Storage.Put( Storage.CurrentContext, processkey, processData );
@@ -308,27 +321,29 @@ namespace Neo.SmartContract
 
             if( status == 5 )
             {
+                //calculating key with 256bits that has unique value for the editor
                 byte[] editorKey = ownAddress.Concat("editorAddress".AsByteArray());
                 editorKey = Hash256(editorKey);
 
-                if ( processData.Range( 33, 32 ) != editorKey )
+                if ( processData.Range( 33, 32 ) != editorKey)//getting the data from the header and checking if the caller is the editor
                 {
                     Runtime.Notify( "Not the article editor" );
                     return false;
                 }
 
-                if ( data[0] == 1 || data[0] == 6 )
+                if ( data[0] == 1 || data[0] == 6 ) //checking if the new status sent is valid ( if the article was rejected or will be published )
                 {
                     processData[0] = data[0];
-                    processData = processData.Range(0, (66 + 32 * processData[65])); // limpando dados anteriores
+                    processData = processData.Range(0, (66 + 32 * processData[65])); // getting only the header
 
+                    //just some way to create an array with variable that compiled
                     int len = processData[65];
                     byte[] numApproval = new byte[] { };
                     for (int i = 0; i < len; ++i)
                         numApproval.Concat(new byte[] { 0 });
 
-                    processData = processData.Concat(numApproval); // adicionando campos para os revisores avaliarem se o artigo que o author colocará sem criptografia foi o mesmo que eles avaliaram.
-                                                                   // 1 não aprovado e 2 aprovado
+                    processData = processData.Concat(numApproval); // Adding a space for the reviwers approve the decrypted article that will be sent ( avoiding change the data before the publishment )
+                                                                   // set 1 for approved and 2 for rejected
                     Storage.Put(Storage.CurrentContext, processkey, processData);
                     return true;
                 }
@@ -339,45 +354,47 @@ namespace Neo.SmartContract
 
             if( status == 6 )
             {
+                //calculating key with 256bits that has unique value for the author
                 byte[] authorKey = processkey.Concat("Author".AsByteArray());
                 authorKey = authorKey.Concat( ownAddress );
                 authorKey = Hash256( authorKey );
 
-                if( processData.Range( 1, 32 ) != authorKey )
+                if( processData.Range( 1, 32 ) != authorKey)//getting the data from the header and checking if the caller is the author
                 {
                     Runtime.Notify( "Not the article author" );
                     return false;
                 }
 
                 processData[0] = 7;
-                processData = processData.Concat( data ); // artigo descriptografado
+                processData = processData.Concat( data ); // decrypted article
                 Storage.Put( Storage.CurrentContext, processkey, processData );
                 return true;
             }
 
             if ( status == 7 )
             {
-                if( data[0] == 1 || data[0] == 2 )
+                if( data[0] == 1 || data[0] == 2)//checking if the approval data sent is valid ( if the article was rejected or accepted )
                 {
+                    //calculating key with 256bits that has unique value for the reviewer
                     byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
                     reviewerKey = reviewerKey.Concat(ownAddress);
                     reviewerKey = Hash256(reviewerKey);
 
                     int numA = 0;
-                    for (int i = 66, count = 0; i < (66 + 32 * processData[65]); i += 32, count++)
+                    for (int i = 66, count = 0; i < (66 + 32 * processData[65]); i += 32, count++)// finding the reviewer
                     {
                         int idx = (66 + 32 * processData[65]) + count;
-                        if (processData[idx] != 0)
+                        if (processData[idx] != 0)// checking if the reviewer didn't sent anything yet
                             numA++;
                         if (processData.Range(i, 32) == reviewerKey)
                         {
-                            processData[idx] = data[0];
+                            processData[idx] = data[0];// puting the decision
                         }
                     }
 
-                    if (numA == processData[65])// todos avaliaram
+                    if (numA == processData[65])// everybody set the decisions
                     {
-                        processData[0] = 8;
+                        processData[0] = 8;//moving to the next step
                         Storage.Put(Storage.CurrentContext, processkey, processData);
                     }
                     return true;
@@ -391,6 +408,10 @@ namespace Neo.SmartContract
             return false;
         }
 
+        /*
+         This function is for all people involved with the process get the current data inside the processkey. It will change every time that the
+         SendDataToProcess() function change something
+         */
         public static byte[] ReceiveFromProcess( byte[] address, byte[] processkey )
         {
             byte[] ownAddress = address;
@@ -398,10 +419,12 @@ namespace Neo.SmartContract
             if( !VerifyWitness( ownAddress ) )
                 return null;
 
+            //getting the process data
             byte[] processData = Storage.Get( Storage.CurrentContext, processkey );
             Runtime.Notify("restoring processKey => processData: ");
             Runtime.Notify(processData);
-            
+
+            //calculating key with 256bits that has unique value for the author
             byte[] authorKey = processkey.Concat("Author".AsByteArray());
             authorKey = authorKey.Concat( ownAddress );
             authorKey = Hash256( authorKey );
@@ -409,14 +432,16 @@ namespace Neo.SmartContract
             Runtime.Notify(authorKey);
 
 
-            if( processData.Range( 1, 32 ) != authorKey )
+            if( processData.Range( 1, 32 ) != authorKey)//getting the data from the header and checking if the caller is the author
             {
                 Runtime.Notify( "Right author key" );
+                //calculating key with 256bits that has unique value for the editor
                 byte[] editorKey = ownAddress.Concat("editorAddress".AsByteArray());
                 editorKey = Hash256(editorKey);
 
-                if ( processData.Range( 33, 32 ) != editorKey )
+                if ( processData.Range( 33, 32 ) != editorKey)//getting the data from the header and checking if the caller is the editor
                 {
+                    //calculating key with 256bits that has unique value for the reviewer
                     byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
                     reviewerKey = reviewerKey.Concat( ownAddress );
                     reviewerKey = Hash256( reviewerKey );
@@ -424,13 +449,13 @@ namespace Neo.SmartContract
                     bool ok = false;
                     for( int i = 66; i < ( 66 + 32 * processData[65] ); i += 32 )
                     {
-                        if ( processData.Range( i, 32 ) == reviewerKey )
+                        if ( processData.Range( i, 32 ) == reviewerKey)// finding the reviewer
                         {
                             ok = true;
                         }
                     }
 
-                    if( !ok )
+                    if( !ok )//if the caller is not involved with the process, it will be send a null data
                     {
                         Runtime.Notify( "Access denied" );
                         return null;
@@ -441,53 +466,64 @@ namespace Neo.SmartContract
             return processData;
         }
 
-        public static bool Publish( byte[] address, byte[] processkey )
+        /*
+         This function is responsable for the publishment. Only the editor can acess.
+         All the processdata is write into the publishkey
+         */
+        public static byte[] Publish( byte[] address, byte[] processkey )
         {
             if( GetProcessStatus( processkey ) != 8 )
             {
                 Runtime.Notify( "Can't publish" );
-                return false;
+                return null;
             }
 
             byte[] editorAddress = address;
 
             if( !VerifyWitness( editorAddress ) )
-                return false;
+                return null;
 
+            //calculating key with 256bits that has unique value for the editor
             byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
             editorKey = Hash256(editorKey);
 
+            //checking if the editor is registered
             if ( Storage.Get( Storage.CurrentContext, editorKey ) != editorAddress )
             {
                 Runtime.Notify( "Not an Editor" );
-                return false;
+                return null;
             }
 
+            //calculating key with 256bits that has unique value for all editor processes
             byte[] epKey = editorAddress.Concat("editorProcess".AsByteArray());
             epKey = Hash256( epKey );
 
             byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
 
-            for( int i = 0; i < processes.Length; i += 32 )
+            for( int i = 0; i < processes.Length; i += 32 )//checking if it's the calling editor processes
             {
                 if( processes.Range( i, 32 ) == processkey )
                 {
+                    //calculating key with 256bits that has unique value for the publishment
                     byte[] publishKey = processkey.Concat("Publish".AsByteArray()); ;
                     publishKey = Hash256( publishKey );
 
-                    if( Storage.Get( Storage.CurrentContext, publishKey ).Length >= 0 )
+                    if( Storage.Get( Storage.CurrentContext, publishKey ).Length >= 0 )//checkig if it was already published
                     {
                         Runtime.Notify( "It was already published" );
-                        return false;
+                        return null;
                     }
 
+                    //publishing using the publishkey
+                    byte[] processData = Storage.Get( Storage.CurrentContext, processkey );
+                    Storage.Put( Storage.CurrentContext, publishKey, processData );
                     Runtime.Notify( "Published" );
-                    return true;
+                    return publishKey;
                 }
             }
 
             Runtime.Notify( "Not a process of this Editor" );
-            return false;
+            return null;
         }
 
 
@@ -565,7 +601,7 @@ namespace Neo.SmartContract
             Runtime.Notify(ReviewerAddress);
 
             /* adicionando o revisor no ranking */
-            if( Storage.Get( Storage.CurrentContext, address ).Length == 0 )
+            if ( Storage.Get( Storage.CurrentContext, address ).Length == 0 )
                 return true;
             /* lvl hash */
             byte[] lvlhash = ReviewerAddress.Concat("endorseLvl".AsByteArray());
@@ -589,6 +625,9 @@ namespace Neo.SmartContract
             return true;
         }
 
+        /*
+         check if the caller is who claims to be
+         */
         private static bool VerifyWitness( byte[] address )
         {
             bool ok = Runtime.CheckWitness( address );
@@ -597,12 +636,26 @@ namespace Neo.SmartContract
             return ok;
         }
 
+        /*
+         This function is responsable for the endorsement.
+         Only reviweres can participate.
+         All the skills is write into the reviewer address.
+         You'll only change your level if you have been endorsed x times by reviewers with level higher or equal to yours.
+         this x times is exactly your current level.
+         everydoy starts with lvl 1 and it is set when the reviewer is registered.
+
+            Endorse data:
+             * levels's hash -> where to find reviewer level ( 32 bytes )
+             * skill's hash -> where to find skills level ( 32 bytes )
+             * counter level -> where to find all endorses from reviewers with level >= reviewer
+            the count is set by the array length
+         */
         public static bool Endorse( byte[] address, byte[] toaddress, byte[] skill )
         {
             if( !VerifyWitness( address ) )
                 return false;
 
-            if ( address == toaddress )
+            if ( address == toaddress )// you cant endorse yourself
             {
                 Runtime.Notify( "You can't endorse yourself" );
                 return false;
@@ -613,16 +666,17 @@ namespace Neo.SmartContract
             byte[] senderData = Storage.Get( Storage.CurrentContext, address );
             byte[] receiverData = Storage.Get( Storage.CurrentContext, toaddress );
 
-            if( senderData.Length == 0 || receiverData.Length == 0 )
+            if( senderData.Length == 0 || receiverData.Length == 0 )//cheking if the sender and the receiver is a registered reviewer
             {
                 Runtime.Notify( "Not a reviewer" );
                 return false;
             }
 
+            //getting all the skills
             byte[] receiverSkills = Storage.Get( Storage.CurrentContext, Storage.Get( Storage.CurrentContext, receiverData.Range( 32, 32 ) ) );
 
             bool ok = false;
-            for( int i = 0; i < receiverSkills.Length; i += 32 )
+            for( int i = 0; i < receiverSkills.Length; i += 32 )// checking if ou already have this skill endorsed and if this address already endorsed this skill
             {
                 byte[] sk = receiverSkills.Range(i, 32);
                 if( sk == skill )
@@ -644,7 +698,7 @@ namespace Neo.SmartContract
                 }
             }
 
-            if( !ok )
+            if( !ok )// if it's a new skill, it will be created and added into your data
             {
                 byte[] sk = toaddress.Concat("endorseSkill".AsByteArray());
                 sk = sk.Concat( skill );
@@ -658,12 +712,12 @@ namespace Neo.SmartContract
             byte[] receiverlvl = Storage.Get( Storage.CurrentContext, Storage.Get( Storage.CurrentContext, receiverData.Range( 0, 32 ) ) );
             byte[] senderlvl = Storage.Get(Storage.CurrentContext, Storage.Get( Storage.CurrentContext, senderData.Range( 0, 32 ) ) );
 
-            if( receiverlvl.Length <= senderlvl.Length )
+            if( receiverlvl.Length <= senderlvl.Length )// if the sender level is higher or equal to yours it will be counted
             {
-                receiverLvlCount = receiverLvlCount.Concat( new byte[] { 0 } );// subiu um no contador de lvl
+                receiverLvlCount = receiverLvlCount.Concat( new byte[] { 0 } );
             }
 
-            if( receiverLvlCount.Length == receiverlvl.Length )
+            if( receiverLvlCount.Length == receiverlvl.Length )// if your level counter is equal to your level will go to the next level
             {
                 receiverLvlCount = new byte[] { };
                 receiverlvl = receiverlvl.Concat( new byte[] { 0 } );
@@ -680,6 +734,7 @@ namespace Neo.SmartContract
             return true;
         }
 
+        //check some reviewers endorsements
         public static byte[] GetEndorseData( byte[] address )
         {
             byte[] data = Storage.Get( Storage.CurrentContext, address );

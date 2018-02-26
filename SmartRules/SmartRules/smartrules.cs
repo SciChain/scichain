@@ -7,11 +7,13 @@ namespace Neo.SmartContract
 {
     public class SmartRules : Framework.SmartContract
     {
-        /* -1 não calculado
-         * 0 passou
-         * 1 reprovou
-         * 
-         * o int[] grades terá notas de 0 até 10 de todos os revisores 
+        /* 
+         This is a smart rule. You can set the editor approval automatically
+         This is a default template, you can create yours if you want to
+         This function will return the number -1 if it was not possible to calculate
+         number 0 if the article passed
+         number 1 if the article was rejected
+         the int[] grades has only grades beteween 0 and 10 from all the reviewers
          */
         public static int Main( int[] grades, string opt, int MintoApproval )
         {
