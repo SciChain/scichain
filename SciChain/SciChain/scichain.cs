@@ -231,7 +231,7 @@ namespace Neo.SmartContract
 
             if ( status == 2 )
             {
-                Runtime.Notify("Inside Status");
+                Runtime.Notify("Inside Status 2 - I");
                 Runtime.Notify(status);
                 //calculating key with 256bits that has unique value for the editor
                 byte[] editorKey = ownAddress.Concat("editorAddress".AsByteArray());
@@ -243,28 +243,35 @@ namespace Neo.SmartContract
                     return false;
                 }
 
-		Runtime.Notify("Inside Status II" );
+		Runtime.Notify("Inside Status 2 - II" );
           	Runtime.Notify(status);
          
 
                 if ( data[0] == 1 || data[0] == 3 )
                 {
-                    Runtime.Notify("Inside Status III" );
+                    Runtime.Notify("Inside Status 2 - III" );
                     Runtime.Notify(status);
 
 
-                    processData = processData.Range(0, 65); // removing the abstract
+                    processData = processData.Range(1, 65); // removing the abstract and the first index, because it will be updated
                     Runtime.Notify("processData with abstract cut" );
                     Runtime.Notify(processData);
 
-                    //processData[0] = data[0]; //TODO 
+                    //TODO - create an if that also updates to 1
+                    byte newStatus = data[0];
+                    byte[] newProcessData = new byte[] { 3 };
+                    newProcessData = newProcessData.Concat( processData );
+
 
                     Runtime.Notify("processData with abstract cut and modified status" );
-                    Runtime.Notify(processData);
+                    Runtime.Notify(newProcessData);
 
-                    processData = processData.Concat(data.Range(1, data.Length - 1)); // adding the number of reviwers( 1 byte ) + all the reviewers keys( 32 bytes each ) + all reviewers public keys ( generated outside the blockchain )
+                    newProcessData = newProcessData.Concat(data.Range(1, data.Length - 1)); // adding the number of reviwers( 1 byte ) + all the reviewers keys( 32 bytes each ) + all reviewers public keys ( generated outside the blockchain )
 
-                    Storage.Put(Storage.CurrentContext, processkey, processData);
+                    Runtime.Notify("final processData:" );
+                    Runtime.Notify(newProcessData);
+
+                    Storage.Put(Storage.CurrentContext, processkey, newProcessData);
 
                     return true;
                 }
@@ -275,6 +282,8 @@ namespace Neo.SmartContract
 
             if( status == 3 )
             {
+                Runtime.Notify("Inside Status 3 - I" );
+                Runtime.Notify(status);
                 //calculating key with 256bits that has unique value for the author
                 byte[] authorKey = processkey.Concat("Author".AsByteArray());
                 authorKey.Concat( ownAddress );
@@ -295,20 +304,34 @@ namespace Neo.SmartContract
 
             if( status == 4 )
             {
+                Runtime.Notify("Inside Status 4 - I" );
+                Runtime.Notify(status);
+
                 //calculating key with 256bits that has unique value for the reviewer
                 byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
                 reviewerKey = reviewerKey.Concat( ownAddress );
                 reviewerKey = Hash256( reviewerKey );
 
+                Runtime.Notify("reviewerKey:" );
+                Runtime.Notify(reviewerKey);
+
                 int idx = ( 66 + 32 * processData[65] );
                 for ( int i = 66; i < ( 66 + 32*processData[65] ); i += 32 )
                 {
+                    Runtime.Notify("i:" );
+                    Runtime.Notify(i);
+
+
                     if( processData.Range( i, 32 ) == reviewerKey)//getting the data from the header and checking if the caller is one of the reviewers
                     {
                         //calculating key with 256bits that has unique value for the reviewer to get and write the reviewer comments
                         byte[] reviewerCommentsKey = processkey.Concat("ReviewerComments".AsByteArray());
                         reviewerCommentsKey = reviewerCommentsKey.Concat( reviewerKey );
                         reviewerCommentsKey = Hash256( reviewerCommentsKey );
+
+                  	Runtime.Notify("reviewerCommentsKey:" );
+                    	Runtime.Notify(reviewerCommentsKey);
+
 
                         byte[] reviewerComments = Storage.Get( Storage.CurrentContext, reviewerCommentsKey );
 
@@ -324,7 +347,15 @@ namespace Neo.SmartContract
                         if (processData[idx] == processData[65])
                             processData[0] = 5;// changing the status when all reviewer send the grades
 
+                        Runtime.Notify("processData:" );
+                    	Runtime.Notify(processData);
+
+
                         processData.Concat( reviewerCommentsKey );
+
+                        Runtime.Notify("processData with reviewer comments key:" );
+                    	Runtime.Notify(processData);
+
                         Storage.Put( Storage.CurrentContext, processkey, processData );
                         return true;
                     }
