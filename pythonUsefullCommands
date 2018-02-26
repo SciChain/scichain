@@ -15,27 +15,30 @@ f8ee1d06e55526c5dcac65ea676e49693a987286 -- assigning with static
 4f1c2a7fe898f78cd2828fdb223848e46c21faee -- problem fixed with newProcessData
 9ff9ba444a6c6db84f6c4ef5421a0ad74c1e42ba -- It worked
 1dd91f301555b0f91b87a254846cab3ddbb6da21 -- Time for testing author
+05149e80e2d939738a3cd9649138c8e506b5b562 -- fix authorKey without EditorAdddress
+bae6cc8bafce1f609cf406dbc196b185017fa21f
+
 
 Import Contranct
 import contract HASH.avm "0710" "05" true false   
 
 1)Register editor)
 
-testinvoke 1dd91f301555b0f91b87a254846cab3ddbb6da21 "5265676973746572456469746f722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+testinvoke bae6cc8bafce1f609cf406dbc196b185017fa21f "5265676973746572456469746f722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 
 10) Request Article 
 
-testinvoke 1dd91f301555b0f91b87a254846cab3ddbb6da21 "5265717565737441727469636c652829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","HelloWorldPaper","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
+testinvoke bae6cc8bafce1f609cf406dbc196b185017fa21f "5265717565737441727469636c652829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","HelloWorldPaper","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 
 12) Send Data to Process and, possible, modify it (several tests)
 
 From 2 to 3
 
-testinvoke 1dd91f301555b0f91b87a254846cab3ddbb6da21 "53656e6444617461546f50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b"3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a",b"030252eaab8b2aab608902c651912db34de36e7a2b0fb1761b44255107162d3c79680b81b4c8a5efc597"]
+testinvoke bae6cc8bafce1f609cf406dbc196b185017fa21f "53656e6444617461546f50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b"3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a",b"030252eaab8b2aab608902c651912db34de36e7a2b0fb1761b44255107162d3c79680b81b4c8a5efc597"]
 
 From 3 to 4
 
-testinvoke 1dd91f301555b0f91b87a254846cab3ddbb6da21 "53656e6444617461546f50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b"3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a",b"02020501505050050510505"]
+testinvoke bae6cc8bafce1f609cf406dbc196b185017fa21f "53656e6444617461546f50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b"3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a",b"02020501505050050510505"]
 
 
 --------------------------------------------

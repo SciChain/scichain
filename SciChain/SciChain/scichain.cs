@@ -135,7 +135,7 @@ namespace Neo.SmartContract
             processKey = processKey.Concat(authorAddress);
             processKey = Hash256(processKey);
 
-            Runtime.Notify("middle processKey:");
+            Runtime.Notify("final processKey:");
             Runtime.Notify(processKey);
 
             processes = processes.Concat( processKey );
@@ -202,12 +202,15 @@ namespace Neo.SmartContract
 
             Runtime.Notify("restaured processKey => processData: ");
             Runtime.Notify(processData);
-            Runtime.Notify("status is:");
+            Runtime.Notify("from processKey:");
+            Runtime.Notify(processkey);
+
+            Runtime.Notify("Current process status:");
             Runtime.Notify(status);
 
             if( status == 0 )
             {
-                Runtime.Notify( "Can't send data to a undocumented process key" );
+                Runtime.Notify( "Can't send data to an undocumented process key" );
                 return false;
             }
 
@@ -225,7 +228,7 @@ namespace Neo.SmartContract
 
             if ( status == 9 )
             {
-                Runtime.Notify( "Can't send data to a published process key" );
+                Runtime.Notify( "Can't send data to an already published process key" );
                 return false;
             }
 
