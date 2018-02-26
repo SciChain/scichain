@@ -231,8 +231,8 @@ namespace Neo.SmartContract
 
             if ( status == 2 )
             {
-         Runtime.Notify("Inside Status");
-            Runtime.Notify(status);
+                Runtime.Notify("Inside Status");
+                Runtime.Notify(status);
                 //calculating key with 256bits that has unique value for the editor
                 byte[] editorKey = ownAddress.Concat("editorAddress".AsByteArray());
                 editorKey = Hash256(editorKey);
@@ -253,18 +253,18 @@ namespace Neo.SmartContract
                     Runtime.Notify(status);
 
 
-                    //processData = processData.Range(0, 65); // removing the abstract
+                    processData = processData.Range(0, 65); // removing the abstract
                     Runtime.Notify("processData with abstract cut" );
                     Runtime.Notify(processData);
 
-                    //processData[0] = data[0];
+                    //processData[0] = data[0]; //TODO 
 
                     Runtime.Notify("processData with abstract cut and modified status" );
                     Runtime.Notify(processData);
 
-                    //processData = processData.Concat(data.Range(1, data.Length - 1)); // adding the number of reviwers( 1 byte ) + all the reviewers keys( 32 bytes each ) + all reviewers public keys ( generated outside the blockchain )
+                    processData = processData.Concat(data.Range(1, data.Length - 1)); // adding the number of reviwers( 1 byte ) + all the reviewers keys( 32 bytes each ) + all reviewers public keys ( generated outside the blockchain )
 
-                    //Storage.Put(Storage.CurrentContext, processkey, processData);
+                    Storage.Put(Storage.CurrentContext, processkey, processData);
 
                     return true;
                 }
