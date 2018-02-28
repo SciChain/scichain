@@ -39,10 +39,16 @@ namespace Neo.SmartContract
             if( operation == "Publish()" )
             {
                 if( args.Length != 2 ) return false;
-                return Publish( (byte[])args[0], (byte[])args[1] );
+                return Publish((byte[])args[0], (byte[])args[1]);
             }
 
-            if( operation == "RegisterEditor()" )
+            if (operation == "GetPublishedData()")
+            {
+                if (args.Length != 2) return false;
+                return GetPublishedData((byte[])args[0], (byte[])args[1], (string)args[2]);
+            }
+
+            if ( operation == "RegisterEditor()" )
             {
                 if( args.Length != 1 ) return false;
                 return RegisterEditor( (byte[])args[0] );
@@ -151,6 +157,7 @@ namespace Neo.SmartContract
             Runtime.Notify("authorKey before Hash" );
             Runtime.Notify(authorKey);
             authorKey = Hash256( authorKey );
+            Storage.Put(Storage.CurrentContext, authorKey, authorAddress);//store the author address into authorkey
 
             Runtime.Notify("authorKey:");
             Runtime.Notify(authorKey);
@@ -282,10 +289,19 @@ namespace Neo.SmartContract
 
                     Storage.Put(Storage.CurrentContext, processHeader.Range(0, 32), data.Range(0,1));//setting the new status
 
-                    int reviewerskeysBytes = data[1] * 32;
-                    Storage.Put(Storage.CurrentContext, processHeader.Range(96, 32), data.Range(1, reviewerskeysBytes));// writing the reviewerskeys inside the processReviewerskeys
+                    int reviewersaddressBytes = data[1] * 20;
+                    byte[] reviewersKeys = new byte[] { };
+                    for (int i = 1; i <= reviewersaddressBytes; i += 20)
+                    {
+                        byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
+                        reviewerKey = reviewerKey.Concat(data.Range(i,20));
+                        reviewerKey = Hash256(reviewerKey);
+                        Storage.Put(Storage.CurrentContext, reviewerKey, data.Range(i, 20));//storing reviewer address into reviewer key
+                        reviewersKeys = reviewersKeys.Concat(reviewerKey);
+                    }
 
-                    Storage.Put(Storage.CurrentContext, processHeader.Range(128,32), data.Range(reviewerskeysBytes + 1, data.Length - 1));// all reviewers public keys ( generated outside the blockchain )
+                    Storage.Put(Storage.CurrentContext, processHeader.Range(96, 32), reviewersKeys);// writing the reviewerskeys inside the processReviewerskeys
+                    Storage.Put(Storage.CurrentContext, processHeader.Range(128,32), data.Range(reviewersaddressBytes + 1, data.Length - 1));// all reviewers public keys ( generated outside the blockchain )
                     return true;
                 }
 
@@ -466,7 +482,7 @@ namespace Neo.SmartContract
             if( !VerifyWitness( ownAddress ) )
                 return null;
 
-            //getting the process data
+            //getting the process header
             byte[] processHeader = Storage.Get( Storage.CurrentContext, processkey );
             Runtime.Notify("restoring processKey => processHeader: ");
             Runtime.Notify(processHeader);
@@ -518,18 +534,18 @@ namespace Neo.SmartContract
          This function is responsable for the publishment. Only the editor can acess.
          All the processdata is write into the publishkey
          */
-        public static byte[] Publish( byte[] address, byte[] processkey )
+        public static bool Publish(byte[] address, byte[] processkey)
         {
-            if( GetProcessStatus( processkey ) != 8 )
+            if (GetProcessStatus(processkey) != 8)
             {
-                Runtime.Notify( "Can't publish" );
-                return null;
+                Runtime.Notify("Can't publish");
+                return false;
             }
 
             byte[] editorAddress = address;
 
-            if( !VerifyWitness( editorAddress ) )
-                return null;
+            if (!VerifyWitness(editorAddress))
+                return false;
 
             //calculating key with 256bits that has unique value for the editor
             byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
@@ -538,41 +554,80 @@ namespace Neo.SmartContract
             byte[] processHeader = Storage.Get(Storage.CurrentContext, processkey);
 
             //checking if the editor is registered
-            if ( Storage.Get( Storage.CurrentContext, processHeader.Range(64,32)) != editorAddress )
+            if (Storage.Get(Storage.CurrentContext, processHeader.Range(64, 32)) != editorAddress)
             {
-                Runtime.Notify( "Not an Editor" );
-                return null;
+                Runtime.Notify("Not an Editor");
+                return false;
             }
 
             //calculating key with 256bits that has unique value for all editor processes
             byte[] epKey = editorAddress.Concat("editorProcess".AsByteArray());
-            epKey = Hash256( epKey );
+            epKey = Hash256(epKey);
 
-            byte[] processes = Storage.Get( Storage.CurrentContext, epKey );
+            byte[] processes = Storage.Get(Storage.CurrentContext, epKey);
 
-            for( int i = 0; i < processes.Length; i += 32 )//checking if it's the calling editor processes
+            for (int i = 0; i < processes.Length; i += 32)//checking if it's the calling editor processes
             {
-                if( processes.Range( i, 32 ) == processkey )
+                if (processes.Range(i, 32) == processkey)
                 {
-                    //calculating key with 256bits that has unique value for the publishment
-                    byte[] publishKey = processkey.Concat("Publish".AsByteArray()); ;
-                    publishKey = Hash256( publishKey );
-
-                    if( Storage.Get( Storage.CurrentContext, publishKey ).Length >= 0 )//checkig if it was already published
-                    {
-                        Runtime.Notify( "It was already published" );
-                        return null;
-                    }
-
-                    //publishing using the publishkey
-                    byte[] processData = Storage.Get( Storage.CurrentContext, processHeader.Range(128,32));
-                    Storage.Put( Storage.CurrentContext, publishKey, processData );
-                    Runtime.Notify( "Published" );
-                    return publishKey;
+                    Storage.Put(Storage.CurrentContext, processHeader.Range(0, 32), new byte[] { 9 });
+                    Runtime.Notify("Published");
+                    return true;
                 }
             }
 
-            Runtime.Notify( "Not a process of this Editor" );
+            Runtime.Notify("Not a process of this Editor");
+            return false;
+
+        }
+
+        /*
+         This function is responsable for the publishment data. Everyone with the process key can get all the data.
+         Use EditorKey to get the editor key ( 32 bytes )
+         Use AuthorAddress to get the author address ( 20 bytes )
+         Use ReviewersAddress to get all the reviewers address ( 20 bytes each )
+         Use Paper to get the paper itself ( size unknow )
+         */
+        public static byte[] GetPublishedData( byte[] address, byte[] processkey, string infoRequest )
+        {
+            if( GetProcessStatus( processkey ) != 9 )
+            {
+                Runtime.Notify( "Not Published" );
+                return null;
+            }
+
+            if( !VerifyWitness( address ) )
+                return null;
+
+            //getting the process header
+            byte[] processHeader = Storage.Get(Storage.CurrentContext, processkey);
+
+            if( infoRequest == "EditorKey" )
+            {
+                return processHeader.Range(64, 32);
+            }
+
+            if (infoRequest == "AuthorAddress")
+            {
+                return Storage.Get(Storage.CurrentContext, processHeader.Range(32, 32) );
+            }
+
+            if (infoRequest == "ReviewersAddress")
+            {
+                byte[] publishData = new byte[] { };
+                byte[] reviwersKeys = Storage.Get(Storage.CurrentContext, processHeader.Range(96, 32));
+                for (int i = 0; i < reviwersKeys.Length; i += 32)
+                {
+                    publishData = publishData.Concat(Storage.Get(Storage.CurrentContext, reviwersKeys.Range(i, 32)));
+                }
+                return publishData;
+            }
+
+            if (infoRequest == "Paper")
+            {
+                return Storage.Get(Storage.CurrentContext, processHeader.Range(128, 32));
+            }
+
             return null;
         }
 
