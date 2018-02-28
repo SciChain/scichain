@@ -1,4 +1,6 @@
-1) Register editor
+SC Hash: 2c7febbf7f15778e07ce529b7574c39a42467b76
+
+1) Register editor OK
 "5265676973746572456469746f722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 
 b'Editor registered'
@@ -9,39 +11,40 @@ b'29ca0156b7d9c9e4592821631872e2d497a92b89ee508f0767fcec3686abc7c7' (32 bytes)
 
 ======================================================================
 
-2) Register editor
+2) Register editor OK
 
 "5265676973746572456469746f722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 ---It would say that editor was already registered
 
 b'Editor is already registered'
 
-Results ["ByteArray: bytearray(b'\\x00')"] 
+Results ["ByteArray: b')\\xca\\x01V\\xb7\\xd9\\xc9\\xe4Y(!c\\x18r\\xe2\\xd4\\x97\\xa9+\\x89\\xeeP\\x8f\\x07g\\xfc\\xec6\\x86\\xab\\xc7\\xc7'"] 
+b'29ca0156b7d9c9e4592821631872e2d497a92b89ee508f0767fcec3686abc7c7' (32 bytes)
 
 
 ======================================================================
 
-3) Register reviewer
+3) Register reviewer OK
 
 "526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","APLJBPhtRg2XLhtpxEHd6aRNL7YSLGH2ZL"]
 ---Reviewer should be registered
 
-b'Current storage for the key:' # reviewersKey
-b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J' #b'057ba8e363413758ced374e55786888bf1b969ed33ee15dbf63e7fbfa056d84a'
-b'is:'
-b'' # reviewers = getStorage(reviewersKey)
-b'Reviewer registered'
-b'This should be the next storage:' #reviewers
-b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f' #b'52eaab8b2aab608902c651912db34de36e7a2b0f'
-b'Since this addres was included:' #ReviewerAddress
-b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f' #b'52eaab8b2aab608902c651912db34de36e7a2b0f'
+b'Current storage for the key:']
+b'\xf9\x01\xd0\xdf*\x9eyG?\x0e"\x8b\xae\xa4\xfe\x95\x16\xf4\x88\x06\xa6\x98\xcd"tT\x84\xfa\xcb\xa2\xae%'] #f901d0df2a9e79473f0e228baea4fe9516f48806a698cd22745484facba2ae25
+b'is:']
+b'\x00']
+b'Reviewer registered']
+b'This should be the next storage:']
+b'\x00R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f'] #0052eaab8b2aab608902c651912db34de36e7a2b0f
+b'Since this addres was included:']
+b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f'] #52eaab8b2aab608902c651912db34de36e7a2b0f
 
 Results ['Integer: 1 '] 
 
 
 ======================================================================
 
-4) Register reviewer
+4) Register reviewer FAIL
 
 "526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","APLJBPhtRg2XLhtpxEHd6aRNL7YSLGH2ZL"]
 ---It would say that reviewer was already registered
@@ -55,29 +58,8 @@ b'Reviewer already registered'
 
 Results ["ByteArray: bytearray(b'\\x00')"] 
 
-
 ======================================================================
-
-5) Register reviewer
-
-"526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
----Another reviewer should be registered
-
-b'Current storage for the key:'
-b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J' #b'057ba8e363413758ced374e55786888bf1b969ed33ee15dbf63e7fbfa056d84a'
-b'is:' #reviewers
-b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f' #b'52eaab8b2aab608902c651912db34de36e7a2b0f'
-b'Reviewer registered'
-b'This should be the next storage:'
-b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9' #b'52eaab8b2aab608902c651912db34de36e7a2b0f23ba2703c53263e8d6e522dc32203339dcd8eee9'
-b'Since this addres was included:'
-b'#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9' #b'23ba2703c53263e8d6e522dc32203339dcd8eee9'
-
-Results ['Integer: 1 '] 
-
-======================================================================
-
-6) Register reviewer (with a wrong editor)
+5) Register reviewer (with a wrong editor) OK
 
 "526567697374657252657669657765722829" ["AQaJZTKshTQzcCKmsaoNVrtSP1pEB3Utn9","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 ---It would notify that it was not the Editor in charge (failed checkwitness)
@@ -85,43 +67,9 @@ Results ['Integer: 1 ']
 
 Results ["ByteArray: bytearray(b'\\x00')"] 
 
-
 ======================================================================
 
-7) Register reviewer
-
-"526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
-
-b'Current storage for the key:'
-b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J'
-b'is:'
-b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9'
-b'Reviewer already registered'
-
-Results ["ByteArray: bytearray(b'\\x00')"] 
-
-======================================================================
-
-8) Register reviewer
-
-"526567697374657252657669657765722829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","AXxCjds5Fxy7VSrriDMbCrSRTxpRdvmLtx"]
-
-b'Current storage for the key:'
-b'\x05{\xa8\xe3cA7X\xce\xd3t\xe5W\x86\x88\x8b\xf1\xb9i\xed3\xee\x15\xdb\xf6>\x7f\xbf\xa0V\xd8J' #b'057ba8e363413758ced374e55786888bf1b969ed33ee15dbf63e7fbfa056d84a'
-b'is:'
-b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9' #b'52eaab8b2aab608902c651912db34de36e7a2b0f23ba2703c53263e8d6e522dc32203339dcd8eee9'
-b'Reviewer registered'
-b'This should be the next storage:'
-b'R\xea\xab\x8b*\xab`\x89\x02\xc6Q\x91-\xb3M\xe3nz+\x0f#\xba\'\x03\xc52c\xe8\xd6\xe5"\xdc2 39\xdc\xd8\xee\xe9\xb1v\x1bD%Q\x07\x16-<yh\x0b\x81\xb4\xc8\xa5\xef\xc5\x97' #b'52eaab8b2aab608902c651912db34de36e7a2b0f23ba2703c53263e8d6e522dc32203339dcd8eee9b1761b44255107162d3c79680b81b4c8a5efc597'
-
-b'Since this addres was included:'
-b'\xb1v\x1bD%Q\x07\x16-<yh\x0b\x81\xb4\xc8\xa5\xef\xc5\x97' #b'b1761b44255107162d3c79680b81b4c8a5efc597'
-
-Results ['Integer: 1 '] 
-
-======================================================================
-
-9) Register reviewer (with a wrong wallet) (w4)
+6) Register reviewer (with a wrong wallet) (w4) OK
 
 "526567697374657252657669657765722829" ["AQaJZTKshTQzcCKmsaoNVrtSP1pEB3Utn9","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 ---It would notify that it was not the Editor in charge 
@@ -132,7 +80,7 @@ Results ["ByteArray: bytearray(b'\\x00')"]
 
 ======================================================================
 
-10) Request Article 
+7) Request Article FAIL
 
 "5265717565737441727469636c652829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y","HelloWorldPaper","AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y"]
 
@@ -156,15 +104,11 @@ b'processKey => processData: '
 b'\x02V\xf0\xb2\x14\x08g\xb5\x8b\xe7\x83\xf0\x81\xcf\x06\x1e\xaf\x80\xbb\x08v\xe9{\xa4\x944\xc7\x01\t\xea\xaf\x10\xc9)\xca\x01V\xb7\xd9\xc9\xe4Y(!c\x18r\xe2\xd4\x97\xa9+\x89\xeeP\x8f\x07g\xfc\xec6\x86\xab\xc7\xc7\x00HelloWorldPaper'
 #b'0256f0b2140867b58be783f081cf061eaf80bb0876e97ba49434c70109eaaf10c929ca0156b7d9c9e4592821631872e2d497a92b89ee508f0767fcec3686abc7c70048656c6c6f576f726c645061706572'
 
-
-Results ["ByteArray: b'=\\xc7^\\x81\\x011\\xdc\\xd3\\x86\\xdb\\x94\\xf4V\\xb8\\xba\\x9f#\\x05\\xe0\\xb7q\\xe4ge9\\xeb[\\x98\\xad\\xa6\\xa1J'"] 
-b'3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a'
-
 ======================================================================
 
-11) Get process status
+8) Get process status FAIL
 
-"47657450726f636573735374617475732829" [b'3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a']
+"47657450726f636573735374617475732829" [b'cc80f0859c476b8ea1f5287fb0c4ddac92754a59be562c9df8044e85a75c728e05']
 
 b'restoring processKey => processData: ']
 b'\x02V\xf0\xb2\x14\x08g\xb5\x8b\xe7\x83\xf0\x81\xcf\x06\x1e\xaf\x80\xbb\x08v\xe9{\xa4\x944\xc7\x01\t\xea\xaf\x10\xc9)\xca\x01V\xb7\xd9\xc9\xe4Y(!c\x18r\xe2\xd4\x97\xa9+\x89\xeeP\x8f\x07g\xfc\xec6\x86\xab\xc7\xc7\x00HelloWorldPaper']
@@ -173,7 +117,7 @@ Results ["ByteArray: bytearray(b'\\x02')"]
 
 ======================================================================
 
-12) Recieve from process
+9) Recieve from process NOT TESTED YET
 
 "5265636569766546726f6d50726f636573732829" ["AK2nJJpJr6o664CWJKi1QRXjqeic2zRp8y",b'3dc75e810131dcd386db94f456b8ba9f2305e0b771e4676539eb5b98ada6a14a']
 
@@ -186,7 +130,7 @@ Results ["ByteArray: bytearray(b'\\x02V\\xf0\\xb2\\x14\\x08g\\xb5\\x8b\\xe7\\x83
 
 ======================================================================
 
-12) Send Data to Process and, possible, modify it (several tests)
+10) Send Data to Process and, possible, modify it (several tests) NOT TESTED YET
 
 Revisores  APLJBPhtRg2XLhtpxEHd6aRNL7YSLGH2ZL  AXxCjds5Fxy7VSrriDMbCrSRTxpRdvmLtx Status 03
 Data: b'030252eaab8b2aab608902c651912db34de36e7a2b0fb1761b44255107162d3c79680b81b4c8a5efc597'

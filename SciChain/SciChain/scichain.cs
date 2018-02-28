@@ -166,7 +166,7 @@ namespace Neo.SmartContract
                 status key ( 32 byte )
                 author key ( 32 bytes )
                 editor key ( 32 bytes )
-                process reviewers key ( 32 bytes ) - > all reviewers keys inside
+                process reviewers key ( 32 bytes ) - > all reviewers keys inside ( 32 bytes each )
                 data key ( 32 bytes )
             */
             //calculating key with 256bits that has unique value for the process status
@@ -188,18 +188,18 @@ namespace Neo.SmartContract
             approvalKey = Hash256(approvalKey);
 
             //creating the process header: 192 bytes
-            byte[] processData = new byte[] {}; 
-            processData = processData.Concat(statusKey); // byte 0 - 31
-            processData = processData.Concat(authorKey); // byte 32 - 63
-            processData = processData.Concat(editorKey); // byte 64 - 95
-            processData = processData.Concat(processReviewersKey); // byte 96 - 127
-            processData = processData.Concat( dataKey ); // byte 128 - 159
-            processData = processData.Concat(approvalKey); // byte 160 - 191
+            byte[] processHeader = new byte[] {}; 
+            processHeader = processHeader.Concat(statusKey); // byte 0 - 31
+            processHeader = processHeader.Concat(authorKey); // byte 32 - 63
+            processHeader = processHeader.Concat(editorKey); // byte 64 - 95
+            processHeader = processHeader.Concat(processReviewersKey); // byte 96 - 127
+            processHeader = processHeader.Concat( dataKey ); // byte 128 - 159
+            processHeader = processHeader.Concat(approvalKey); // byte 160 - 191
 
             Runtime.Notify("processKey => processData: ");
-            Runtime.Notify(processData);
+            Runtime.Notify(processHeader);
 
-            Storage.Put( Storage.CurrentContext, processKey, processData ); //writing the data
+            Storage.Put( Storage.CurrentContext, processKey, processHeader ); //writing the data
 
             return processKey;
         }
