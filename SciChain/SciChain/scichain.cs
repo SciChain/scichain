@@ -773,7 +773,7 @@ namespace Neo.SmartContract
         }
 
         /* some neo that will be restored at the ending of the process
-           avoiding span the system*/
+           avoiding spam the system*/
         private static bool Charging(byte[] chargingKey)
         {
             return true;
@@ -897,6 +897,7 @@ namespace Neo.SmartContract
             return data;
         }
 
+        /* Responsable for the tax values, only the owner can change the value */
         public static bool SetTax( byte[] address, byte[] newValue )
         {
             if (!VerifyWitness(address))
