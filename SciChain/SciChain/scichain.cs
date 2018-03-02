@@ -3,11 +3,15 @@ using Neo.SmartContract.Framework.Services.Neo;
 using Neo.SmartContract.Framework.Services.System;
 using System;
 using System.Linq;
+using System.Numerics;
 
 namespace Neo.SmartContract
 {
     public class SciChain : Framework.SmartContract
     {
+        private static readonly byte[] owner = "031a6c6fbbdf02ca351745fa86b9ba5a9452d785ac4f7fc2b7548ca2a46c4fcf4a".HexToBytes(); //w1 da private net
+        private static readonly byte[] NEO = { 155, 124, 255, 218, 166, 116, 190, 174, 15, 147, 14, 190, 96, 133, 175, 144, 147, 229, 254, 86, 179, 74, 92, 34, 12, 205, 207, 110, 252, 51, 111, 197 };
+
         public static object Main( string operation, params object[] args )
         {
 
@@ -18,10 +22,10 @@ namespace Neo.SmartContract
                 return GetProcessStatus( (byte[])args[0] ); 
             }
 
-            if( operation == "RequestArticle()" )
+            if( operation == "RequestPaper()" )
             {
                 if( args.Length != 3 ) return false;
-                return RequestArticle( (byte[])args[0], (byte[])args[1], (byte[])args[2] );
+                return RequestPaper( (byte[])args[0], (byte[])args[1], (byte[])args[2] );
             }
 
             if( operation == "SendDataToProcess()" )
@@ -72,6 +76,12 @@ namespace Neo.SmartContract
                 return GetEndorseData( (byte[])args[0] );
             }
 
+            if (operation == "SetTax()")
+            {
+                if (args.Length != 2) return false;
+                return SetTax((byte[])args[0], (byte[])args[1]);
+            }
+
             return false;
         }
 
@@ -80,10 +90,10 @@ namespace Neo.SmartContract
              Not found -> 0
              Process rejected -> 1
              Waiting editor acceptance ->  2
-             Waiting encrypted article ->  3
+             Waiting encrypted paper ->  3
              Waiting Reviewers send grades and comments -> 4
              Waiting Editor approval -> 5
-             Waiting decrypted article -> 6
+             Waiting decrypted paper -> 6
              waiting reviewers approval -> 7
              Waiting for publication ->  8
              Published -> 9
@@ -102,7 +112,7 @@ namespace Neo.SmartContract
          recieves WIF address of main author, abstract and WIF of the editor that will handle it
          verifies if Editor is registered and returns the processKey with abstract and both publicKeys
         */ 
-        public static byte[] RequestArticle( byte[] address, byte[] data, byte[] editorAddress )
+        public static byte[] RequestPaper( byte[] address, byte[] data, byte[] editorAddress )
         {
             byte[] authorAddress = address;
 
@@ -168,7 +178,19 @@ namespace Neo.SmartContract
                 editor key ( 32 bytes )
                 process reviewers key ( 32 bytes ) - > all reviewers keys inside ( 32 bytes each )
                 data key ( 32 bytes )
+                approval key ( 32 bytes )
+                changing key ( 32 bytes )
             */
+            //calculating key with 256bits that has unique value for charging
+            byte[] chargingKey = processKey.Concat("Charging".AsByteArray());
+            chargingKey = Hash256(chargingKey);
+
+            if( !Charging(chargingKey) )
+            {
+                Runtime.Notify("Not the right tax");
+                return null;
+            }
+
             //calculating key with 256bits that has unique value for the process status
             byte[] statusKey = processKey.Concat("Status".AsByteArray());
             statusKey = Hash256(statusKey);
@@ -195,6 +217,7 @@ namespace Neo.SmartContract
             processHeader = processHeader.Concat(processReviewersKey); // byte 96 - 127
             processHeader = processHeader.Concat( dataKey ); // byte 128 - 159
             processHeader = processHeader.Concat(approvalKey); // byte 160 - 191
+            processHeader = processHeader.Concat(chargingKey); // byte 192 - 223
 
             Runtime.Notify("processKey => processData: ");
             Runtime.Notify(processHeader);
@@ -274,7 +297,7 @@ namespace Neo.SmartContract
 
                 if (processHeader.Range( 64, 32 ) != editorKey ) //getting the data from the header and checking if the caller is the editor
                 {
-                    Runtime.Notify( "Not the article editor" );
+                    Runtime.Notify( "Not the paper editor" );
                     return false;
                 }
 
@@ -288,6 +311,12 @@ namespace Neo.SmartContract
                     Runtime.Notify(status);
 
                     Storage.Put(Storage.CurrentContext, processHeader.Range(0, 32), data.Range(0,1));//setting the new status
+
+                    if(data[0] == 1)
+                    {
+                        Refund(processHeader.Range(192, 32));
+                        Runtime.Notify("Refunded");
+                    }
 
                     int reviewersaddressBytes = data[1] * 20;
                     byte[] reviewersKeys = new byte[] { };
@@ -305,7 +334,7 @@ namespace Neo.SmartContract
                     return true;
                 }
 
-                Runtime.Notify("A status data must be Rejected(1) or Waiting article(3)");
+                Runtime.Notify("A status data must be Rejected(1) or Waiting paper(3)");
                 return false;
             }
 
@@ -329,14 +358,14 @@ namespace Neo.SmartContract
 
                 if(processHeader.Range( 32, 32 ) != authorKey) //getting the data from the header and checking if the caller is the author
                 {
-                    Runtime.Notify( "Not the article author" );
+                    Runtime.Notify( "Not the paper author" );
                     return false;
                 }
 
                 Storage.Put(Storage.CurrentContext, processHeader.Range(0, 32), new byte[] { 4 } );//setting the new status
-                Storage.Put(Storage.CurrentContext, processHeader.Range(128, 32), data); //sending the article encrypted by a simmetric key and the simetric key used encrypted with the public keys
+                Storage.Put(Storage.CurrentContext, processHeader.Range(128, 32), data); //sending the paper encrypted by a simmetric key and the simetric key used encrypted with the public keys
 
-                Runtime.Notify("newProcessData with Article:" );
+                Runtime.Notify("newProcessData with Paper:" );
                 Runtime.Notify(data);
                 return true;
             }
@@ -402,14 +431,19 @@ namespace Neo.SmartContract
 
                 if (processHeader.Range( 64, 32 ) != editorKey)//getting the data from the header and checking if the caller is the editor
                 {
-                    Runtime.Notify( "Not the article editor" );
+                    Runtime.Notify( "Not the paper editor" );
                     return false;
                 }
 
-                if ( data[0] == 1 || data[0] == 6 ) //checking if the new status sent is valid ( if the article was rejected or will be published )
+                if ( data[0] == 1 || data[0] == 6 ) //checking if the new status sent is valid ( if the paper was rejected or will be published )
                 {
                     Storage.Put(Storage.CurrentContext, processHeader.Range(0, 32), data.Range(0, 1));//setting the new status
                     Storage.Delete(Storage.CurrentContext, processHeader.Range(128, 32));//cleaning all data
+                    if (data[0] == 1)
+                    {
+                        Refund(processHeader.Range(192, 32));
+                        Runtime.Notify("Refunded");
+                    }
                     return true;
                 }
 
@@ -426,18 +460,18 @@ namespace Neo.SmartContract
 
                 if(processHeader.Range( 32, 32 ) != authorKey)//getting the data from the header and checking if the caller is the author
                 {
-                    Runtime.Notify( "Not the article author" );
+                    Runtime.Notify( "Not the paper author" );
                     return false;
                 }
 
                 Storage.Put(Storage.CurrentContext, processHeader.Range(0, 32), new byte[] { 7 });//moving to the next step
-                Storage.Put(Storage.CurrentContext, processHeader.Range(128, 32), data); // decrypted article
+                Storage.Put(Storage.CurrentContext, processHeader.Range(128, 32), data); // decrypted paper
                 return true;
             }
 
             if ( status == 7 )
             {
-                if( data[0] == 1 || data[0] == 2)//checking if the approval data sent is valid ( if the article was rejected or accepted )
+                if( data[0] == 1 || data[0] == 2)//checking if the approval data sent is valid ( if the paper was rejected or accepted )
                 {
                     //calculating key with 256bits that has unique value for the reviewer
                     byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
@@ -467,7 +501,7 @@ namespace Neo.SmartContract
                 return false;
             }
 
-            Runtime.Notify( "Not the article reviewer" );
+            Runtime.Notify( "Not the paper reviewer" );
             return false;
         }
 
@@ -534,18 +568,18 @@ namespace Neo.SmartContract
          This function is responsable for the publishment. Only the editor can acess.
          All the processdata is write into the publishkey
          */
-        public static bool Publish(byte[] address, byte[] processkey)
+        public static byte[] Publish(byte[] address, byte[] processkey)
         {
             if (GetProcessStatus(processkey) != 8)
             {
                 Runtime.Notify("Can't publish");
-                return false;
+                return null;
             }
 
             byte[] editorAddress = address;
 
             if (!VerifyWitness(editorAddress))
-                return false;
+                return null;
 
             //calculating key with 256bits that has unique value for the editor
             byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
@@ -557,7 +591,7 @@ namespace Neo.SmartContract
             if (Storage.Get(Storage.CurrentContext, processHeader.Range(64, 32)) != editorAddress)
             {
                 Runtime.Notify("Not an Editor");
-                return false;
+                return null;
             }
 
             //calculating key with 256bits that has unique value for all editor processes
@@ -571,13 +605,17 @@ namespace Neo.SmartContract
                 if (processes.Range(i, 32) == processkey)
                 {
                     Storage.Put(Storage.CurrentContext, processHeader.Range(0, 32), new byte[] { 9 });
+                    byte[] paper = Storage.Get(Storage.CurrentContext, processHeader.Range(128, 0));
+                    Storage.Delete(Storage.CurrentContext, processHeader.Range(128, 32)); //deleting paper to send to the editor
                     Runtime.Notify("Published");
-                    return true;
+                    Refund(processHeader.Range(192, 32));
+                    Runtime.Notify("Refunded");
+                    return paper;
                 }
             }
 
             Runtime.Notify("Not a process of this Editor");
-            return false;
+            return null;
 
         }
 
@@ -622,12 +660,6 @@ namespace Neo.SmartContract
                 }
                 return publishData;
             }
-
-            if (infoRequest == "Paper")
-            {
-                return Storage.Get(Storage.CurrentContext, processHeader.Range(128, 32));
-            }
-
             return null;
         }
 
@@ -740,6 +772,20 @@ namespace Neo.SmartContract
             return ok;
         }
 
+        /* some neo that will be restored at the ending of the process
+           avoiding span the system*/
+        private static bool Charging(byte[] chargingKey)
+        {
+            return true;
+        }
+
+        /* refound the value sent to start the request
+        */
+        private static bool Refund(byte[] chargingKey)
+        {
+            return true;
+        }
+
         /*
          This function is responsable for the endorsement.
          Only reviweres can participate.
@@ -849,6 +895,16 @@ namespace Neo.SmartContract
             }
 
             return data;
+        }
+
+        public static bool SetTax( byte[] address, byte[] newValue )
+        {
+            if (!VerifyWitness(address))
+                return false;
+            if (address != owner)
+                return false;
+            Storage.Put(Storage.CurrentContext, "NEO", newValue);
+            return true;
         }
     }
 }
