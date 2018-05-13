@@ -9,8 +9,26 @@ namespace Neo.SmartContract
 {
     public class SciChain : Framework.SmartContract
     {
+        private static readonly byte[] PREFIX_STATUS = "STATUS".AsByteArray();
+        private static readonly byte[] PREFIX_EDITOR_ADDRESS = "EDITOR_ADDRESS".AsByteArray();
+        private static readonly byte[] PREFIX_EDITOR_PROCESS = "EDITOR_PROCESS".AsByteArray();
+        private static readonly byte[] PREFIX_PROCESS = "PROCESS".AsByteArray();
+        private static readonly byte[] PREFIX_AUTHOR = "AUTHOR".AsByteArray();
+        private static readonly byte[] PREFIX_CHARGING = "CHARGING".AsByteArray();
+        private static readonly byte[] PREFIX_PRECESS_REVIEWERS = "PROCESS_REVIEWERS".AsByteArray();
+        private static readonly byte[] PREFIX_DATA = "DATA".AsByteArray();
+        private static readonly byte[] PREFIX_APPROVAL = "APPROVAL".AsByteArray();
+        private static readonly byte[] PREFIX_REVIEWER = "REVIEWER".AsByteArray();
+        private static readonly byte[] PREFIX_REVIEWERS_ADDRESS = "REVIEWERS_ADDRESS".AsByteArray();
+        private static readonly byte[] PREFIX_REVIEWER_COMMENTS = "REVIEWER_COMMENTS".AsByteArray();
+        private static readonly byte[] PREFIX_ENDORSE_LVL = "ENDORSE_LVL".AsByteArray();
+        private static readonly byte[] PREFIX_ENDORSE_COUNT = "ENDORSE_COUNT".AsByteArray();
+        private static readonly byte[] PREFIX_ENDORSE_LVL_COUNT = "ENDORSE_LVL_COUNT".AsByteArray();
+        private static readonly byte[] PREFIX_ENDORSE_SKILL = "ENDORSE_SKILL".AsByteArray();
+
         private static readonly byte[] owner = "031a6c6fbbdf02ca351745fa86b9ba5a9452d785ac4f7fc2b7548ca2a46c4fcf4a".HexToBytes(); //w1 da private net
-        private static readonly byte[] NEO = { 155, 124, 255, 218, 166, 116, 190, 174, 15, 147, 14, 190, 96, 133, 175, 144, 147, 229, 254, 86, 179, 74, 92, 34, 12, 205, 207, 110, 252, 51, 111, 197 };
+        private static readonly byte[] NEO_ID = { 155, 124, 255, 218, 166, 116, 190, 174, 15, 147, 14, 190, 96, 133, 175, 144, 147, 229, 254, 86, 179, 74, 92, 34, 12, 205, 207, 110, 252, 51, 111, 197 };
+        private static readonly byte[] GAS_ID = { 231, 45, 40, 105, 121, 238, 108, 177, 183, 230, 93, 253, 223, 178, 227, 132, 16, 11, 141, 20, 142, 119, 88, 222, 66, 228, 22, 139, 113, 121, 44, 96 };
 
         public static object Main( string operation, params object[] args )
         {
@@ -100,7 +118,7 @@ namespace Neo.SmartContract
          */
         public static byte GetProcessStatus( byte[] processkey )
         {
-            byte[] statusKey = processkey.Concat("Status".AsByteArray());
+            byte[] statusKey = processkey.Concat(PREFIX_STATUS);
             statusKey = Hash256(statusKey);
             byte[] status = Storage.Get(Storage.CurrentContext, statusKey);
             if (status.Length == 0)
@@ -120,7 +138,7 @@ namespace Neo.SmartContract
                 return null;
 
             //calculating key with 256bits that has unique value for the editor
-            byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
+            byte[] editorKey = editorAddress.Concat(PREFIX_EDITOR_ADDRESS);
             editorKey = Hash256(editorKey);
 
             Runtime.Notify("using editorKey:");
@@ -134,7 +152,7 @@ namespace Neo.SmartContract
             }
 
             //calculating key with 256bits that has unique value for all editor processes
-            byte[] epKey = editorAddress.Concat("editorProcess".AsByteArray());
+            byte[] epKey = editorAddress.Concat(PREFIX_EDITOR_PROCESS);
             epKey = Hash256(epKey);
 
             Runtime.Notify("using epKey:");
@@ -147,7 +165,7 @@ namespace Neo.SmartContract
 
             /*calculating key with 256bits that has unique value for the process
                using all previous processes keys as nonce*/
-            byte[] processKey = Hash256(processes).Concat("Process".AsByteArray());
+            byte[] processKey = Hash256(processes).Concat(PREFIX_PROCESS);
             processKey = processKey.Concat(editorAddress);
             processKey = processKey.Concat(authorAddress);
             processKey = Hash256(processKey);
@@ -162,7 +180,7 @@ namespace Neo.SmartContract
             Runtime.Notify(processes);
 
             //calculating key with 256bits that has unique value for the author
-            byte[] authorKey = processKey.Concat("Author".AsByteArray());
+            byte[] authorKey = processKey.Concat(PREFIX_AUTHOR);
             authorKey = authorKey.Concat( authorAddress );
             Runtime.Notify("authorKey before Hash" );
             Runtime.Notify(authorKey);
@@ -182,7 +200,7 @@ namespace Neo.SmartContract
                 changing key ( 32 bytes )
             */
             //calculating key with 256bits that has unique value for charging
-            byte[] chargingKey = processKey.Concat("Charging".AsByteArray());
+            byte[] chargingKey = processKey.Concat(PREFIX_CHARGING);
             chargingKey = Hash256(chargingKey);
 
             if( !Charging(chargingKey) )
@@ -192,21 +210,21 @@ namespace Neo.SmartContract
             }
 
             //calculating key with 256bits that has unique value for the process status
-            byte[] statusKey = processKey.Concat("Status".AsByteArray());
+            byte[] statusKey = processKey.Concat(PREFIX_STATUS);
             statusKey = Hash256(statusKey);
             Storage.Put(Storage.CurrentContext, statusKey, new byte[] { 2 });// first status -> Waiting editor acceptance
 
             //calculating key with 256bits that has unique value for the process reviewers
-            byte[] processReviewersKey = processKey.Concat("ProcessReviewers".AsByteArray());
+            byte[] processReviewersKey = processKey.Concat(PREFIX_PRECESS_REVIEWERS);
             processReviewersKey = Hash256(processReviewersKey);
 
             //calculating key with 256bits that has unique value for the process data
-            byte[] dataKey = processKey.Concat("Data".AsByteArray());
+            byte[] dataKey = processKey.Concat(PREFIX_DATA);
             dataKey = Hash256(dataKey);
             Storage.Put(Storage.CurrentContext, dataKey, data);// abstract
 
             //calculating key with 256bits that has unique value for the last process Approval
-            byte[] approvalKey = processKey.Concat("Approval".AsByteArray());
+            byte[] approvalKey = processKey.Concat(PREFIX_APPROVAL);
             approvalKey = Hash256(approvalKey);
 
             //creating the process header: 192 bytes
@@ -292,7 +310,7 @@ namespace Neo.SmartContract
                 Runtime.Notify("Inside Status 2 - I");
                 Runtime.Notify(status);
                 //calculating key with 256bits that has unique value for the editor
-                byte[] editorKey = ownAddress.Concat("editorAddress".AsByteArray());
+                byte[] editorKey = ownAddress.Concat(PREFIX_EDITOR_ADDRESS);
                 editorKey = Hash256(editorKey);
 
                 if (processHeader.Range( 64, 32 ) != editorKey ) //getting the data from the header and checking if the caller is the editor
@@ -322,7 +340,7 @@ namespace Neo.SmartContract
                     byte[] reviewersKeys = new byte[] { };
                     for (int i = 1; i <= reviewersaddressBytes; i += 20)
                     {
-                        byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
+                        byte[] reviewerKey = processkey.Concat(PREFIX_REVIEWER);
                         reviewerKey = reviewerKey.Concat(data.Range(i,20));
                         reviewerKey = Hash256(reviewerKey);
                         Storage.Put(Storage.CurrentContext, reviewerKey, data.Range(i, 20));//storing reviewer address into reviewer key
@@ -343,7 +361,7 @@ namespace Neo.SmartContract
                 Runtime.Notify("Inside Status 3 - I" );
                 Runtime.Notify(status);
                 //calculating key with 256bits that has unique value for the author
-                byte[] authorKey = processkey.Concat("Author".AsByteArray());
+                byte[] authorKey = processkey.Concat(PREFIX_AUTHOR);
                 authorKey = authorKey.Concat( ownAddress );
                 Runtime.Notify("authorKey before Hash" );
                 Runtime.Notify(authorKey);
@@ -376,7 +394,7 @@ namespace Neo.SmartContract
                 Runtime.Notify(status);
 
                 //calculating key with 256bits that has unique value for the reviewer
-                byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
+                byte[] reviewerKey = processkey.Concat(PREFIX_REVIEWER);
                 reviewerKey = reviewerKey.Concat( ownAddress );
                 reviewerKey = Hash256( reviewerKey );
 
@@ -393,7 +411,7 @@ namespace Neo.SmartContract
                     if(reviewersKeys.Range( i, 32 ) == reviewerKey)//getting the data from the header and checking if the caller is one of the reviewers
                     {
                         //calculating key with 256bits that has unique value for the reviewer to get and write the reviewer comments
-                        byte[] reviewerCommentsGradesKey = processkey.Concat("ReviewerComments".AsByteArray());
+                        byte[] reviewerCommentsGradesKey = processkey.Concat(PREFIX_REVIEWER_COMMENTS);
                         reviewerCommentsGradesKey = reviewerCommentsGradesKey.Concat( reviewerKey );
                         reviewerCommentsGradesKey = Hash256( reviewerCommentsGradesKey );
 
@@ -426,7 +444,7 @@ namespace Neo.SmartContract
             if( status == 5 )
             {
                 //calculating key with 256bits that has unique value for the editor
-                byte[] editorKey = ownAddress.Concat("editorAddress".AsByteArray());
+                byte[] editorKey = ownAddress.Concat(PREFIX_EDITOR_ADDRESS);
                 editorKey = Hash256(editorKey);
 
                 if (processHeader.Range( 64, 32 ) != editorKey)//getting the data from the header and checking if the caller is the editor
@@ -454,7 +472,7 @@ namespace Neo.SmartContract
             if( status == 6 )
             {
                 //calculating key with 256bits that has unique value for the author
-                byte[] authorKey = processkey.Concat("Author".AsByteArray());
+                byte[] authorKey = processkey.Concat(PREFIX_AUTHOR);
                 authorKey = authorKey.Concat( ownAddress );
                 authorKey = Hash256( authorKey );
 
@@ -474,7 +492,7 @@ namespace Neo.SmartContract
                 if( data[0] == 1 || data[0] == 2)//checking if the approval data sent is valid ( if the paper was rejected or accepted )
                 {
                     //calculating key with 256bits that has unique value for the reviewer
-                    byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
+                    byte[] reviewerKey = processkey.Concat(PREFIX_REVIEWER);
                     reviewerKey = reviewerKey.Concat(ownAddress);
                     reviewerKey = Hash256(reviewerKey);
 
@@ -522,7 +540,7 @@ namespace Neo.SmartContract
             Runtime.Notify(processHeader);
 
             //calculating key with 256bits that has unique value for the author
-            byte[] authorKey = processkey.Concat("Author".AsByteArray());
+            byte[] authorKey = processkey.Concat(PREFIX_AUTHOR);
             authorKey = authorKey.Concat( ownAddress );
             authorKey = Hash256( authorKey );
             Runtime.Notify("authorKey: ");
@@ -533,13 +551,13 @@ namespace Neo.SmartContract
             {
                 Runtime.Notify( "Right author key" );
                 //calculating key with 256bits that has unique value for the editor
-                byte[] editorKey = ownAddress.Concat("editorAddress".AsByteArray());
+                byte[] editorKey = ownAddress.Concat(PREFIX_EDITOR_ADDRESS);
                 editorKey = Hash256(editorKey);
 
                 if (processHeader.Range( 64, 32 ) != editorKey)//getting the data from the header and checking if the caller is the editor
                 {
                     //calculating key with 256bits that has unique value for the reviewer
-                    byte[] reviewerKey = processkey.Concat("Reviewer".AsByteArray());
+                    byte[] reviewerKey = processkey.Concat(PREFIX_REVIEWER);
                     reviewerKey = reviewerKey.Concat( ownAddress );
                     reviewerKey = Hash256( reviewerKey );
 
@@ -582,7 +600,7 @@ namespace Neo.SmartContract
                 return null;
 
             //calculating key with 256bits that has unique value for the editor
-            byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
+            byte[] editorKey = editorAddress.Concat(PREFIX_EDITOR_ADDRESS);
             editorKey = Hash256(editorKey);
 
             byte[] processHeader = Storage.Get(Storage.CurrentContext, processkey);
@@ -595,7 +613,7 @@ namespace Neo.SmartContract
             }
 
             //calculating key with 256bits that has unique value for all editor processes
-            byte[] epKey = editorAddress.Concat("editorProcess".AsByteArray());
+            byte[] epKey = editorAddress.Concat(PREFIX_EDITOR_PROCESS);
             epKey = Hash256(epKey);
 
             byte[] processes = Storage.Get(Storage.CurrentContext, epKey);
@@ -674,7 +692,7 @@ namespace Neo.SmartContract
 
             if (!Runtime.CheckWitness(editorAddress)) return null;
 
-            byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
+            byte[] editorKey = editorAddress.Concat(PREFIX_EDITOR_ADDRESS);
             editorKey = Hash256( editorKey );
 
             if ( Storage.Get( Storage.CurrentContext, editorKey ) == editorAddress )
@@ -699,7 +717,7 @@ namespace Neo.SmartContract
 
             if (!Runtime.CheckWitness(editorAddress)) return false;
 
-            byte[] editorKey = editorAddress.Concat("editorAddress".AsByteArray());
+            byte[] editorKey = editorAddress.Concat(PREFIX_EDITOR_ADDRESS);
             editorKey = Hash256( editorKey );
 
             if ( Storage.Get( Storage.CurrentContext, editorKey ) != editorAddress )
@@ -708,7 +726,7 @@ namespace Neo.SmartContract
                 return false;
             }
 
-            byte[] reviewersKey = editorAddress.Concat("reviewersAddress".AsByteArray());
+            byte[] reviewersKey = editorAddress.Concat(PREFIX_REVIEWERS_ADDRESS);
             reviewersKey = Hash256( reviewersKey );
 
             byte[] reviewers = Storage.Get( Storage.CurrentContext, reviewersKey );
@@ -741,15 +759,15 @@ namespace Neo.SmartContract
             if ( Storage.Get( Storage.CurrentContext, address ).Length == 0 )
                 return true;
             /* lvl hash */
-            byte[] lvlhash = ReviewerAddress.Concat("endorseLvl".AsByteArray());
+            byte[] lvlhash = ReviewerAddress.Concat(PREFIX_ENDORSE_LVL);
             lvlhash = Hash256( lvlhash );
 
             /* hash skills count */
-            byte[] skillscounthash = ReviewerAddress.Concat("endorseCount".AsByteArray());
+            byte[] skillscounthash = ReviewerAddress.Concat(PREFIX_ENDORSE_COUNT);
             skillscounthash = Hash256( skillscounthash );
 
             /* hash skills count */
-            byte[] lvlcounthash = ReviewerAddress.Concat("endorseLvlCount".AsByteArray());
+            byte[] lvlcounthash = ReviewerAddress.Concat(PREFIX_ENDORSE_LVL_COUNT);
             lvlcounthash = Hash256( lvlcounthash );
 
             byte[] endorseData = new byte[] {};
@@ -850,7 +868,7 @@ namespace Neo.SmartContract
 
             if( !ok )// if it's a new skill, it will be created and added into your data
             {
-                byte[] sk = toaddress.Concat("endorseSkill".AsByteArray());
+                byte[] sk = toaddress.Concat(PREFIX_ENDORSE_SKILL);
                 sk = sk.Concat( skill );
                 sk = Hash256( sk );
                 Storage.Put( Storage.CurrentContext, sk, address );
