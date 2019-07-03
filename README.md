@@ -1,3 +1,9 @@
+<p align="center">
+    <img
+      src="https://github.com/SciChain/scichain.github.io/blob/master/assets/logo/scichain_legacy_logo.png?raw=true"
+      width="125px;" />
+</p>
+
 Welcome to SciChain: Science on the Blockchain
 
 Science is the core of the modern society, bringing us a deeper understanding of the world and
@@ -23,9 +29,10 @@ One the many flaws in scientific studies is also related to low reproducibility 
 usually "accept" only "new" results. Most of these journals require authors to pay for the download of each publication, what strongly undermines
 the capacity of the researchers (mainly in underdeveloped countries) to be updated with newer discoveries.
 
-==============
+Visit us at [https://scichain.org](https://scichain.org)!
 
 Donation accepted at: **_AdfJSyxgpTZTGSWCnApWPA49hQG7ANVdht_**
 
-Copyleft 2017-2018
+Copyleft 2017-2019
+
 SciChain team
